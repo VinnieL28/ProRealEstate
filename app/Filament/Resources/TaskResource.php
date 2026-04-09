@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\TaskResource\Pages;
 use App\Models\Task;
 use App\Models\User;
+use Filament\Notifications\Notification;
 use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
@@ -84,6 +85,46 @@ class TaskResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+
+                    Tables\Actions\BulkAction::make('reassign')
+                        ->label('Reassign Selected')
+                        ->icon('heroicon-o-arrow-path')
+                        ->form([
+                            Select::make('assigned_to_id')
+                                ->label('Reassign To')
+                                ->options(fn () => User::orderBy('name')->pluck('name', 'id'))
+                                ->required()
+                                ->searchable(),
+                        ])
+                        ->action(function ($records, array $data) {
+                            $count = 0;
+                            foreach ($records as $task) {
+                                $task->update(['assigned_to_id' => $data['assigned_to_id']]);
+                                $count++;
+                            }
+                            Notification::make()
+                                ->title("Reassigned {$count} task(s) successfully.")
+                                ->success()
+                                ->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
+
+                    Tables\Actions\BulkAction::make('mark_done')
+                        ->label('Mark as Done')
+                        ->icon('heroicon-o-check-circle')
+                        ->requiresConfirmation()
+                        ->action(function ($records) {
+                            $count = 0;
+                            foreach ($records as $task) {
+                                $task->update(['status' => 'done']);
+                                $count++;
+                            }
+                            Notification::make()
+                                ->title("Marked {$count} task(s) as done.")
+                                ->success()
+                                ->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
                 ]),
             ]);
     }
