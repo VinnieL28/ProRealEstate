@@ -1,0 +1,26 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up(): void
+    {
+        Schema::create('kpi_metrics', function (Blueprint $table) {
+            $table->id();
+            $table->string('metric_key');
+            $table->date('occurred_on');
+            $table->decimal('metric_value', 12, 2)->default(0);
+            $table->string('source')->nullable();
+            $table->json('context')->nullable();
+            $table->timestamps();
+            $table->unique(['metric_key', 'occurred_on', 'source'], 'kpi_metrics_unique');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('kpi_metrics');
+    }
+};
