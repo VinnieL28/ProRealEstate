@@ -12,6 +12,7 @@ use App\Filament\Widgets\TasksDueWidget;
 use App\Filament\Widgets\KpiPerformance;
 use App\Filament\Widgets\LeaderboardWidget;
 use App\Filament\Widgets\CalendarWidget;
+use App\Filament\Widgets\HotLeadsWidget;
 
 class Dashboard extends BaseDashboard
 {
@@ -24,6 +25,7 @@ class Dashboard extends BaseDashboard
     {
         return [
             DashboardStats::class,
+            HotLeadsWidget::class,
             TodayActivity::class,
             ThisWeekStats::class,
             KpiPerformance::class,

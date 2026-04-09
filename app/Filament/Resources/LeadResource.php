@@ -196,7 +196,34 @@ class LeadResource extends Resource
                     'success' => 'closed_won',
                     'danger' => 'closed_lost',
                 ])->label('Stage')->sortable(),
-                Tables\Columns\TextColumn::make('motivation_level')->label('Motivation'),
+                Tables\Columns\BadgeColumn::make('motivation_level')
+                    ->label('Motivation')
+                    ->colors([
+                        'gray'    => fn ($state) => $state <= 2,
+                        'warning' => fn ($state) => $state === 3,
+                        'danger'  => fn ($state) => $state >= 4,
+                    ])
+                    ->formatStateUsing(fn ($state) => match ((int) $state) {
+                        1 => '● 1',
+                        2 => '● 2',
+                        3 => '● 3',
+                        4 => '🔥 4',
+                        5 => '🔥 5',
+                        default => '—',
+                    })
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('hot_score')
+                    ->label('Score')
+                    ->sortable(query: fn ($query, $direction) => $query->orderByRaw(
+                        "(motivation_level * 2
+                          + CASE WHEN sell_timeline = 'asap' THEN 2 ELSE 0 END
+                          + CASE WHEN past_due_notice = 1 THEN 1.5 ELSE 0 END
+                          + CASE WHEN deferred_maintenance = 1 THEN 0.5 ELSE 0 END
+                          + CASE WHEN listed_with_agent = 1 THEN -2 ELSE 0 END
+                         ) $direction"
+                    ))
+                    ->formatStateUsing(fn ($state) => number_format($state, 1) . ' / 10')
+                    ->color(fn ($state) => $state >= 7 ? 'danger' : ($state >= 5 ? 'warning' : 'gray')),
                 Tables\Columns\TextColumn::make('assignedTo.name')->label('Assigned')->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')->since()->label('Last touch'),
                 Tables\Columns\TextColumn::make('created_at')->dateTime('M d, Y')->label('Created'),

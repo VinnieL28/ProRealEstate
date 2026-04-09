@@ -57,11 +57,43 @@ class Lead extends Model
     ];
 
     protected $casts = [
-        'tags' => 'array',
-        'asking_price' => 'decimal:2',
-        'max_offer' => 'decimal:2',
-        'last_offer' => 'decimal:2',
+        'tags'          => 'array',
+        'asking_price'  => 'decimal:2',
+        'max_offer'     => 'decimal:2',
+        'last_offer'    => 'decimal:2',
     ];
+
+    /**
+     * Compute a 0–10 hot score based on motivation signals.
+     *
+     * Scoring:
+     *   motivation_level (1–5) × 2            = 0–10 base
+     *   sell_timeline = 'asap'                = +2
+     *   past_due_notice = true                = +1.5
+     *   deferred_maintenance = true           = +0.5
+     *   listed_with_agent = true              = −2  (less off-market urgency)
+     *   Clamped to 0–10
+     */
+    public function getHotScoreAttribute(): float
+    {
+        $score = ($this->motivation_level ?? 0) * 2;
+
+        if ($this->sell_timeline === 'asap')  $score += 2;
+        if ($this->past_due_notice)            $score += 1.5;
+        if ($this->deferred_maintenance)       $score += 0.5;
+        if ($this->listed_with_agent)          $score -= 2;
+
+        return (float) max(0, min(10, $score));
+    }
+
+    /**
+     * Whether this lead qualifies as "hot": score ≥ 7 and not closed.
+     */
+    public function getIsHotAttribute(): bool
+    {
+        return $this->hot_score >= 7
+            && !in_array($this->stage, ['closed_won', 'closed_lost'], true);
+    }
 
     public function team(): BelongsTo
     {
