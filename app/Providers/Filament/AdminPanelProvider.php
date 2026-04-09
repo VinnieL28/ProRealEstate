@@ -48,6 +48,7 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Pages\Dashboard::class,
                 LeadKanban::class,
                 \App\Filament\Pages\CalendarPage::class,
+                \App\Filament\Pages\ReportsPage::class,
             ])
             ->discoverWidgets(
                 in: app_path('Filament/Widgets'),
