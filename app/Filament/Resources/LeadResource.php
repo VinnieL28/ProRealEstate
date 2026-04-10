@@ -9,6 +9,7 @@ use App\Filament\Resources\LeadResource\RelationManagers\SmsLogsRelationManager;
 use App\Filament\Resources\LeadResource\RelationManagers\TasksRelationManager;
 use App\Filament\Resources\LeadResource\RelationManagers\AttachmentsRelationManager;
 use App\Filament\Resources\LeadResource\RelationManagers\ActivitiesRelationManager;
+use App\Filament\Resources\LeadResource\RelationManagers\EmailLogsRelationManager;
 use App\Models\Lead;
 use App\Models\Deal;
 use App\Models\User;
@@ -35,8 +36,10 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\CallLog;
 use App\Models\SmsLog;
 use App\Services\TwilioService;
+use App\Exports\LeadsExport;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LeadResource extends Resource
 {
@@ -47,6 +50,21 @@ class LeadResource extends Resource
     protected static ?string $navigationGroup = 'Leads';
 
     protected static ?string $navigationLabel = 'Leads';
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+
+        // cold_caller and real_estate_agent only see their own assigned leads
+        if ($user && in_array($user->role, ['cold_caller', 'real_estate_agent'], true)) {
+            $query->where('assigned_to_id', $user->id);
+        } elseif ($user && $user->team_id) {
+            $query->where('leads.team_id', $user->team_id);
+        }
+
+        return $query;
+    }
 
     public static function form(Form $form): Form
     {
@@ -186,9 +204,9 @@ class LeadResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('owner_name')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('phone')->searchable(),
-                Tables\Columns\TextColumn::make('lead_source')->sortable(),
-                Tables\Columns\TextColumn::make('major_market')->label('Market'),
+                Tables\Columns\TextColumn::make('phone')->searchable()->hiddenOn('sm'),
+                Tables\Columns\TextColumn::make('lead_source')->sortable()->hiddenOn('sm'),
+                Tables\Columns\TextColumn::make('major_market')->label('Market')->hiddenOn(['sm', 'md']),
                 Tables\Columns\BadgeColumn::make('stage')->colors([
                     'primary' => 'new_lead',
                     'warning' => 'no_contact',
@@ -224,9 +242,9 @@ class LeadResource extends Resource
                     ))
                     ->formatStateUsing(fn ($state) => number_format($state, 1) . ' / 10')
                     ->color(fn ($state) => $state >= 7 ? 'danger' : ($state >= 5 ? 'warning' : 'gray')),
-                Tables\Columns\TextColumn::make('assignedTo.name')->label('Assigned')->sortable(),
-                Tables\Columns\TextColumn::make('updated_at')->since()->label('Last touch'),
-                Tables\Columns\TextColumn::make('created_at')->dateTime('M d, Y')->label('Created'),
+                Tables\Columns\TextColumn::make('assignedTo.name')->label('Assigned')->sortable()->hiddenOn('sm'),
+                Tables\Columns\TextColumn::make('updated_at')->since()->label('Last touch')->hiddenOn('sm'),
+                Tables\Columns\TextColumn::make('created_at')->dateTime('M d, Y')->label('Created')->hiddenOn(['sm', 'md']),
             ])
             ->filters([
                 SelectFilter::make('stage')->options([
@@ -342,15 +360,24 @@ class LeadResource extends Resource
                             $csv = implode(",", ['Owner Name', 'Email', 'Phone', 'Stage']) . "\n";
                             foreach ($records as $lead) {
                                 $csv .= implode(",", [
-                                    $lead->owner_name,
-                                    $lead->email,
-                                    $lead->phone,
-                                    $lead->stage,
+                                    '"' . str_replace('"', '""', $lead->owner_name ?? '') . '"',
+                                    '"' . str_replace('"', '""', $lead->email ?? '') . '"',
+                                    '"' . str_replace('"', '""', $lead->phone ?? '') . '"',
+                                    '"' . str_replace('"', '""', $lead->stage ?? '') . '"',
                                 ]) . "\n";
                             }
                             return response()->streamDownload(function () use ($csv) {
                                 echo $csv;
                             }, 'leads.csv');
+                        }),
+                    Action::make('export_excel')
+                        ->label('Export Excel')
+                        ->icon('heroicon-o-table-cells')
+                        ->action(function () {
+                            return Excel::download(
+                                new LeadsExport(auth()->user()?->team_id),
+                                'leads-' . now()->format('Ymd') . '.xlsx'
+                            );
                         }),
                     Tables\Actions\BulkAction::make('reassign')
                         ->label('Reassign Selected')
@@ -422,6 +449,7 @@ class LeadResource extends Resource
             SmsLogsRelationManager::class,
             AttachmentsRelationManager::class,
             ActivitiesRelationManager::class,
+            EmailLogsRelationManager::class,
         ];
     }
 

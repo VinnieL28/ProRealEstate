@@ -2,6 +2,10 @@
 
 namespace App\Models;
 
+use App\Events\LeadCreatedEvent;
+use App\Events\LeadStageChangedEvent;
+use App\Notifications\HotLeadFlagged;
+use App\Notifications\NewLeadAssigned;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -147,11 +151,35 @@ class Lead extends Model
 
     protected static function booted(): void
     {
+        static::created(function (Lead $lead) {
+            LeadCreatedEvent::dispatch($lead);
+
+            // Notify the assigned agent
+            if ($lead->assigned_to_id) {
+                $assignee = \App\Models\User::find($lead->assigned_to_id);
+                $assignee?->notify(new NewLeadAssigned($lead));
+            }
+        });
+
         static::updated(function (Lead $lead) {
             $originalStage = $lead->getOriginal('stage');
             $newStage = $lead->stage;
 
+            // Notify new assignee when reassigned
+            if ($lead->wasChanged('assigned_to_id') && $lead->assigned_to_id) {
+                $assignee = \App\Models\User::find($lead->assigned_to_id);
+                $assignee?->notify(new NewLeadAssigned($lead));
+            }
+
+            // Notify when lead becomes hot
+            if ($lead->wasChanged('motivation_level') && $lead->is_hot && $lead->assigned_to_id) {
+                $assignee = \App\Models\User::find($lead->assigned_to_id);
+                $assignee?->notify(new HotLeadFlagged($lead));
+            }
+
             if ($originalStage !== $newStage) {
+                LeadStageChangedEvent::dispatch($lead, (string) $originalStage, (string) $newStage);
+
                 Activity::create([
                     'team_id' => $lead->team_id,
                     'user_id' => auth()->id(),

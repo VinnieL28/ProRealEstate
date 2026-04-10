@@ -24,7 +24,11 @@ class LeadPolicy extends BaseRolePolicy
 
     public function update(User $user, Lead $lead): bool
     {
-        return $this->canManage($user);
+        if ($this->canManage($user)) {
+            return true;
+        }
+        // Agents can edit their own assigned leads
+        return $this->canLimited($user) && $lead->assigned_to_id === $user->id;
     }
 
     public function delete(User $user, Lead $lead): bool

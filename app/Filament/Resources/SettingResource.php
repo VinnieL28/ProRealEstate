@@ -5,7 +5,9 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\SettingResource\Pages;
 use App\Models\Setting;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Section;
@@ -22,10 +24,43 @@ class SettingResource extends Resource
 
     protected static ?string $navigationGroup = 'Settings';
 
+    public static function canAccess(): bool
+    {
+        return in_array(auth()->user()?->role, ['owner', 'admin'], true);
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                Section::make('Company Identity')->columns(2)->schema([
+                    TextInput::make('company_name')->label('Company Name')->placeholder('Pro Real Estate LLC'),
+                    Select::make('timezone')
+                        ->label('Timezone')
+                        ->searchable()
+                        ->options(fn () => collect(\DateTimeZone::listIdentifiers())->mapWithKeys(fn ($tz) => [$tz => $tz])->toArray())
+                        ->default('UTC'),
+                    FileUpload::make('company_logo')
+                        ->label('Company Logo')
+                        ->image()
+                        ->directory('logos')
+                        ->columnSpanFull(),
+                ]),
+
+                Section::make('SMTP Email (Laravel Mail)')->columns(2)->schema([
+                    TextInput::make('smtp_host')->label('SMTP Host')->placeholder('smtp.mailgun.org'),
+                    TextInput::make('smtp_port')->label('SMTP Port')->numeric()->placeholder('587'),
+                    TextInput::make('smtp_username')->label('SMTP Username'),
+                    TextInput::make('smtp_password')->label('SMTP Password')->password(),
+                    Select::make('smtp_encryption')->label('Encryption')->options([
+                        'tls'  => 'TLS',
+                        'ssl'  => 'SSL',
+                        'null' => 'None',
+                    ])->default('tls'),
+                    TextInput::make('smtp_from_address')->label('From Address')->email(),
+                    TextInput::make('smtp_from_name')->label('From Name'),
+                ]),
+
                 Section::make('Pipeline & Defaults')->schema([
                     TextInput::make('default_currency')->label('Default Currency')->default('USD'),
                     Repeater::make('pipeline_stages')

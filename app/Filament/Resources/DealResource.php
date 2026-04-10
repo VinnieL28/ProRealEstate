@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Exports\DealsExport;
 use App\Filament\Resources\DealResource\Pages;
 use App\Filament\Resources\DealResource\RelationManagers\TasksRelationManager;
 use App\Models\Deal;
@@ -20,6 +21,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Filament\Resources\DealResource\RelationManagers\AttachmentsRelationManager;
 use App\Filament\Resources\DealResource\RelationManagers\ActivitiesRelationManager;
 
@@ -30,6 +32,21 @@ class DealResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
 
     protected static ?string $navigationGroup = 'Deals';
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+
+        // Agents only see deals linked to their leads
+        if ($user && in_array($user->role, ['cold_caller', 'real_estate_agent'], true)) {
+            $query->whereHas('lead', fn ($q) => $q->where('assigned_to_id', $user->id));
+        } elseif ($user && $user->team_id) {
+            $query->where('deals.team_id', $user->team_id);
+        }
+
+        return $query;
+    }
 
     public static function form(Form $form): Form
     {
@@ -72,14 +89,14 @@ class DealResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('property.address')->label('Property'),
-                Tables\Columns\TextColumn::make('lead.owner_name')->label('Seller'),
+                Tables\Columns\TextColumn::make('property.address')->label('Property')->hiddenOn('sm'),
+                Tables\Columns\TextColumn::make('lead.owner_name')->label('Seller')->hiddenOn('sm'),
                 Tables\Columns\BadgeColumn::make('stage')->sortable(),
-                Tables\Columns\TextColumn::make('purchase_price')->money('usd', true)->label('Buy'),
-                Tables\Columns\TextColumn::make('sale_price')->money('usd', true)->label('Sell'),
+                Tables\Columns\TextColumn::make('purchase_price')->money('usd', true)->label('Buy')->hiddenOn(['sm', 'md']),
+                Tables\Columns\TextColumn::make('sale_price')->money('usd', true)->label('Sell')->hiddenOn('sm'),
                 Tables\Columns\TextColumn::make('profit')->money('usd', true)->label('Profit'),
-                Tables\Columns\TextColumn::make('roi')->suffix('%')->label('ROI'),
-                Tables\Columns\TextColumn::make('closing_date')->date(),
+                Tables\Columns\TextColumn::make('roi')->suffix('%')->label('ROI')->hiddenOn(['sm', 'md']),
+                Tables\Columns\TextColumn::make('closing_date')->date()->hiddenOn('sm'),
             ])
             ->filters([
                 SelectFilter::make('stage')->options([
@@ -120,6 +137,13 @@ class DealResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('export_excel')
+                        ->label('Export Excel')
+                        ->icon('heroicon-o-table-cells')
+                        ->action(fn () => Excel::download(
+                            new DealsExport(auth()->user()?->team_id),
+                            'deals-' . now()->format('Ymd') . '.xlsx'
+                        )),
                 ]),
             ]);
     }

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\InboundResponseController;
 use App\Http\Controllers\Api\LeadIngestionController;
 use App\Http\Controllers\Api\TwilioWebhookController;
+use App\Http\Controllers\Api\WebToLeadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/leads/ingest', [LeadIngestionController::class, 'store']);
+
+// Web-to-Lead capture (public, no auth — for embedding in landing pages)
+Route::post('/leads', [WebToLeadController::class, 'store'])->name('api.leads.capture');
 Route::post('/drip/inbound-response', [InboundResponseController::class, 'store']);
 
 // Twilio webhooks (no CSRF, no auth — Twilio signs requests)

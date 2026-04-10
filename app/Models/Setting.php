@@ -9,6 +9,9 @@ class Setting extends Model
 {
     protected $fillable = [
         'team_id',
+        'company_name',
+        'company_logo',
+        'timezone',
         'default_currency',
         'pipeline_stages',
         'lead_sources',
@@ -25,6 +28,13 @@ class Setting extends Model
         'file_storage_driver',
         'inbox_provider',
         'email_provider',
+        'smtp_host',
+        'smtp_port',
+        'smtp_username',
+        'smtp_password',
+        'smtp_encryption',
+        'smtp_from_address',
+        'smtp_from_name',
     ];
 
     protected $casts = [

@@ -6,6 +6,7 @@ use App\Filament\Widgets\Reports\AgentPerformanceWidget;
 use App\Filament\Widgets\Reports\LeadSourceRoiWidget;
 use App\Filament\Widgets\Reports\PipelineVelocityWidget;
 use App\Filament\Widgets\Reports\RevenueByAgentChart;
+use App\Filament\Widgets\Reports\ReportFilterWidget;
 use App\Filament\Widgets\Reports\RevenueByMonthChart;
 use App\Filament\Widgets\Reports\RevenueByQuarterChart;
 use Filament\Pages\Page;
@@ -29,6 +30,7 @@ class ReportsPage extends Page
     public function getWidgets(): array
     {
         return [
+            ReportFilterWidget::class,
             RevenueByMonthChart::class,
             RevenueByQuarterChart::class,
             RevenueByAgentChart::class,

@@ -58,10 +58,10 @@ class TaskResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('assignedTo.name')->label('Assigned'),
+                Tables\Columns\TextColumn::make('assignedTo.name')->label('Assigned')->hiddenOn('sm'),
                 Tables\Columns\BadgeColumn::make('status'),
-                Tables\Columns\BadgeColumn::make('priority'),
-                Tables\Columns\TextColumn::make('due_date')->dateTime(),
+                Tables\Columns\BadgeColumn::make('priority')->hiddenOn('sm'),
+                Tables\Columns\TextColumn::make('due_date')->dateTime()->hiddenOn('sm'),
             ])
             ->filters([
                 SelectFilter::make('status')->options([

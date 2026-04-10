@@ -25,7 +25,7 @@ class FileManagerPage extends Page
     public ?string $related_type = null;
     public ?int $related_id = null;
     public ?string $name = null;
-    public $file = null;
+    public mixed $file = null;
 
     public function mount(): void
     {

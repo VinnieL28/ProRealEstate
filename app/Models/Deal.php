@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\DealClosedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -69,6 +70,17 @@ class Deal extends Model
     public function activities(): HasMany
     {
         return $this->hasMany(Activity::class, 'related_id')->where('related_type', 'Deal');
+    }
+
+    protected static function booted(): void
+    {
+        static::updated(function (Deal $deal) {
+            $oldStage = $deal->getOriginal('stage');
+            $newStage = $deal->stage;
+            if ($oldStage !== $newStage && $newStage === 'closed_won') {
+                DealClosedEvent::dispatch($deal);
+            }
+        });
     }
 
     public function getProfitAttribute(): ?float

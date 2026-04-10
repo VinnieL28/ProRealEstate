@@ -49,11 +49,14 @@ class AdminPanelProvider extends PanelProvider
                 LeadKanban::class,
                 \App\Filament\Pages\CalendarPage::class,
                 \App\Filament\Pages\ReportsPage::class,
+                \App\Filament\Pages\BackupPage::class,
             ])
             ->discoverWidgets(
                 in: app_path('Filament/Widgets'),
                 for: 'App\\Filament\\Widgets',
             )
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('60s')
             ->renderHook(
                 PanelsRenderHook::AUTH_LOGIN_FORM_AFTER,
                 fn () => view('filament.login-credentials'),
