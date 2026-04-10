@@ -25,7 +25,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/leads/ingest', [LeadIngestionController::class, 'store']);
 
 // Web-to-Lead capture (public, no auth — for embedding in landing pages)
-Route::post('/leads', [WebToLeadController::class, 'store'])->name('api.leads.capture');
+// Rate-limited: max 10 requests per minute per IP
+Route::post('/leads', [WebToLeadController::class, 'store'])
+    ->middleware('throttle:10,1')
+    ->name('api.leads.capture');
 Route::post('/drip/inbound-response', [InboundResponseController::class, 'store']);
 
 // Twilio webhooks (no CSRF, no auth — Twilio signs requests)
