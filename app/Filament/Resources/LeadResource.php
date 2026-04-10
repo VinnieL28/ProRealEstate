@@ -230,18 +230,17 @@ class LeadResource extends Resource
                         default => '—',
                     })
                     ->sortable(),
-                Tables\Columns\TextColumn::make('hot_score')
+                Tables\Columns\BadgeColumn::make('score')
                     ->label('Score')
-                    ->sortable(query: fn ($query, $direction) => $query->orderByRaw(
-                        "(motivation_level * 2
-                          + CASE WHEN sell_timeline = 'asap' THEN 2 ELSE 0 END
-                          + CASE WHEN past_due_notice = 1 THEN 1.5 ELSE 0 END
-                          + CASE WHEN deferred_maintenance = 1 THEN 0.5 ELSE 0 END
-                          + CASE WHEN listed_with_agent = 1 THEN -2 ELSE 0 END
-                         ) $direction"
-                    ))
-                    ->formatStateUsing(fn ($state) => number_format($state, 1) . ' / 10')
-                    ->color(fn ($state) => $state >= 7 ? 'danger' : ($state >= 5 ? 'warning' : 'gray')),
+                    ->sortable()
+                    ->formatStateUsing(fn ($state) => $state ? $state . '/100' : '—')
+                    ->colors([
+                        'success' => fn ($state) => $state >= 70,
+                        'warning' => fn ($state) => $state >= 40 && $state < 70,
+                        'danger'  => fn ($state) => $state !== null && $state < 40,
+                        'gray'    => fn ($state) => $state === null,
+                    ])
+                    ->hiddenOn('sm'),
                 Tables\Columns\TextColumn::make('assignedTo.name')->label('Assigned')->sortable()->hiddenOn('sm'),
                 Tables\Columns\TextColumn::make('updated_at')->since()->label('Last touch')->hiddenOn('sm'),
                 Tables\Columns\TextColumn::make('created_at')->dateTime('M d, Y')->label('Created')->hiddenOn(['sm', 'md']),
@@ -392,6 +391,40 @@ class LeadResource extends Resource
                             $records->each->update(['assigned_to_id' => $data['assigned_to_id']]);
                         })
                         ->deselectRecordsAfterCompletion(),
+
+                    Tables\Actions\BulkAction::make('change_stage')
+                        ->label('Change Stage')
+                        ->icon('heroicon-o-arrow-right-circle')
+                        ->form([
+                            Select::make('stage')
+                                ->label('New Stage')
+                                ->options([
+                                    'new_lead'        => 'New Lead',
+                                    'no_contact'      => 'No Contact Made',
+                                    'contact_made'    => 'Contact Made',
+                                    'appointment_set' => 'Appointment Set',
+                                    'due_diligence'   => 'Due Diligence',
+                                    'offer_made'      => 'Offer Made',
+                                    'under_contract'  => 'Under Contract',
+                                    'closed_won'      => 'Closed Won',
+                                    'closed_lost'     => 'Closed Lost',
+                                ])
+                                ->required(),
+                        ])
+                        ->requiresConfirmation()
+                        ->action(function ($records, array $data) {
+                            $count = 0;
+                            foreach ($records as $lead) {
+                                $lead->update(['stage' => $data['stage']]);
+                                $count++;
+                            }
+                            \Filament\Notifications\Notification::make()
+                                ->title("Updated stage on {$count} lead(s).")
+                                ->success()
+                                ->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
+
                     Action::make('import_csv')
                         ->label('Import CSV')
                         ->icon('heroicon-o-arrow-up-tray')
