@@ -58,6 +58,7 @@ class Lead extends Model
         'mortgage_on_house',
         'tenant_lease_type',
         'property_manager_name',
+        'score',
     ];
 
     protected $casts = [
@@ -88,6 +89,66 @@ class Lead extends Model
         if ($this->listed_with_agent)          $score -= 2;
 
         return (float) max(0, min(10, $score));
+    }
+
+    /**
+     * Calculate a 1–100 lead score for storage in the `score` column.
+     *
+     * Points breakdown (max = 100):
+     *   Motivation (1-5) × 8             =  0–40
+     *   Stage progress                    =  0–15
+     *   Recency (days since last touch)   =  0–20
+     *   Lead source quality               =  0–10
+     *   sell_timeline = asap              = +5
+     *   past_due_notice                   = +5
+     *   deferred_maintenance              = +3
+     *   listed_with_agent                 = -10 (less urgency)
+     */
+    public function calculateScore(): int
+    {
+        $pts = 0;
+
+        // Motivation
+        $pts += ($this->motivation_level ?? 0) * 8;  // 0–40
+
+        // Stage
+        $pts += match ($this->stage) {
+            'new_lead'        => 3,
+            'no_contact'      => 2,
+            'contact_made'    => 5,
+            'appointment_set' => 10,
+            'due_diligence'   => 12,
+            'offer_made'      => 15,
+            'under_contract'  => 15,
+            default           => 0,
+        };
+
+        // Recency
+        $daysSince = (int) now()->diffInDays($this->updated_at ?? $this->created_at);
+        $pts += match (true) {
+            $daysSince <= 1  => 20,
+            $daysSince <= 3  => 15,
+            $daysSince <= 7  => 10,
+            $daysSince <= 14 => 5,
+            default          => 0,
+        };
+
+        // Source quality
+        $pts += match ($this->lead_source ?? '') {
+            'PPC', 'Referral' => 10,
+            'Agent'           => 8,
+            'Cold Call', 'SMS'=> 5,
+            'D4D'             => 3,
+            default           => 2,
+        };
+
+        // Urgency signals
+        if ($this->sell_timeline === 'asap')   $pts += 5;
+        if ($this->past_due_notice)            $pts += 5;
+        if ($this->deferred_maintenance)       $pts += 3;
+        if ($this->listed_with_agent)          $pts -= 10;
+
+        return max(1, min(100, $pts));
     }
 
     /**

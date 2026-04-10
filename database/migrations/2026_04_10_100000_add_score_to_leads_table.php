@@ -1,0 +1,24 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('leads', function (Blueprint $table) {
+            $table->unsignedTinyInteger('score')->nullable()->default(null)->after('motivation_level')
+                  ->comment('Lead score 1-100, recalculated daily by leads:recalculate-scores');
+            $table->index('score');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('leads', function (Blueprint $table) {
+            $table->dropColumn('score');
+        });
+    }
+};
