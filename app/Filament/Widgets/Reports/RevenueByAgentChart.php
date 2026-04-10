@@ -14,9 +14,13 @@ class RevenueByAgentChart extends BarChartWidget
 
     protected static bool $isDiscovered = false;
 
+    protected $listeners = ['report-filter-changed' => '$refresh'];
+
     protected function getData(): array
     {
         $teamId = auth()->user()?->team_id;
+        $from   = session('report_date_from', now()->startOfMonth()->toDateString());
+        $until  = session('report_date_until', now()->endOfMonth()->toDateString());
 
         // Join deals → leads → users to group profit by the lead's assigned agent
         $rows = Deal::query()
@@ -31,6 +35,7 @@ class RevenueByAgentChart extends BarChartWidget
             ->when($teamId, fn ($q) => $q->where('deals.team_id', $teamId))
             ->where('deals.stage', 'closed_won')
             ->whereNotNull('leads.assigned_to_id')
+            ->whereBetween('deals.closing_date', [$from, $until])
             ->groupBy('leads.assigned_to_id')
             ->orderByDesc('total_profit')
             ->limit(10)

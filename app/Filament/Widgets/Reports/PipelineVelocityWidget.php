@@ -14,9 +14,13 @@ class PipelineVelocityWidget extends Widget
 
     protected static bool $isDiscovered = false;
 
+    protected $listeners = ['report-filter-changed' => 'loadData'];
+
     public array $stages = [];
 
-    public function mount(): void
+    public function mount(): void { $this->loadData(); }
+
+    public function loadData(): void
     {
         $teamId = auth()->user()?->team_id;
 

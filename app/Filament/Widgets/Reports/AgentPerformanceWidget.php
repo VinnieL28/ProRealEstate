@@ -15,20 +15,27 @@ class AgentPerformanceWidget extends Widget
 
     protected static bool $isDiscovered = false;
 
+    protected $listeners = ['report-filter-changed' => 'loadData'];
+
     public array $agents = [];
 
-    public function mount(): void
+    public function mount(): void { $this->loadData(); }
+
+    public function loadData(): void
     {
         $teamId = auth()->user()?->team_id;
+        $from   = session('report_date_from', now()->subYear()->startOfMonth()->toDateString());
+        $until  = session('report_date_until', now()->endOfMonth()->toDateString());
 
         $users = User::query()
             ->when($teamId, fn ($q) => $q->where('team_id', $teamId))
             ->get(['id', 'name', 'role']);
 
-        $this->agents = $users->map(function (User $user) use ($teamId) {
+        $this->agents = $users->map(function (User $user) use ($teamId, $from, $until) {
             $leadsQuery = Lead::query()
                 ->when($teamId, fn ($q) => $q->where('team_id', $teamId))
-                ->where('assigned_to_id', $user->id);
+                ->where('assigned_to_id', $user->id)
+                ->whereBetween('created_at', [$from . ' 00:00:00', $until . ' 23:59:59']);
 
             $totalLeads  = (clone $leadsQuery)->count();
             $appts       = (clone $leadsQuery)->where('stage', 'appointment_set')->count();
@@ -45,6 +52,7 @@ class AgentPerformanceWidget extends Widget
                 ->when($teamId, fn ($q) => $q->where('deals.team_id', $teamId))
                 ->where('leads.assigned_to_id', $user->id)
                 ->where('deals.stage', 'closed_won')
+                ->whereBetween('deals.closing_date', [$from, $until])
                 ->sum(\DB::raw('
                     CASE
                         WHEN deals.profit IS NOT NULL THEN deals.profit

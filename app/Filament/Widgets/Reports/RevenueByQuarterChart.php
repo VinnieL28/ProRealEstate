@@ -14,19 +14,21 @@ class RevenueByQuarterChart extends BarChartWidget
 
     protected static bool $isDiscovered = false;
 
+    protected $listeners = ['report-filter-changed' => '$refresh'];
+
     protected function getData(): array
     {
         $teamId  = auth()->user()?->team_id;
+        $from    = Carbon::parse(session('report_date_from', now()->subMonths(23)->startOfMonth()));
+        $until   = Carbon::parse(session('report_date_until', now()->endOfMonth()));
         $labels  = [];
         $profit  = [];
 
-        // Build 8 quarters back from current
-        $now     = Carbon::now();
-        $current = Carbon::create($now->year, (int) ceil($now->month / 3) * 3 - 2, 1);
-
-        for ($i = 7; $i >= 0; $i--) {
-            $qStart = $current->copy()->subMonths($i * 3)->startOfMonth();
-            $qEnd   = $qStart->copy()->addMonths(3)->subDay()->endOfDay();
+        // Walk quarters within the selected date range (max 12)
+        $qStart = $from->copy()->startOfQuarter();
+        $count  = 0;
+        while ($qStart->lte($until) && $count < 12) {
+            $qEnd   = $qStart->copy()->endOfQuarter();
             $qLabel = 'Q' . ceil($qStart->month / 3) . ' ' . $qStart->year;
 
             $labels[] = $qLabel;
@@ -38,6 +40,8 @@ class RevenueByQuarterChart extends BarChartWidget
                 ->get();
 
             $profit[] = round((float) $deals->sum(fn ($d) => $d->profit ?? 0), 2);
+            $qStart->addQuarter();
+            $count++;
         }
 
         return [

@@ -14,14 +14,21 @@ class LeadSourceRoiWidget extends Widget
 
     protected static bool $isDiscovered = false;
 
+    protected $listeners = ['report-filter-changed' => 'loadData'];
+
     public array $rows = [];
 
-    public function mount(): void
+    public function mount(): void { $this->loadData(); }
+
+    public function loadData(): void
     {
         $teamId = auth()->user()?->team_id;
+        $from   = session('report_date_from', now()->subYear()->startOfMonth()->toDateString());
+        $until  = session('report_date_until', now()->endOfMonth()->toDateString());
 
         $sources = Lead::query()
             ->when($teamId, fn ($q) => $q->where('team_id', $teamId))
+            ->whereBetween('created_at', [$from . ' 00:00:00', $until . ' 23:59:59'])
             ->whereNotNull('lead_source')
             ->selectRaw('lead_source, COUNT(*) as total')
             ->groupBy('lead_source')
@@ -30,6 +37,7 @@ class LeadSourceRoiWidget extends Widget
         $closed = Lead::query()
             ->when($teamId, fn ($q) => $q->where('team_id', $teamId))
             ->where('stage', 'closed_won')
+            ->whereBetween('created_at', [$from . ' 00:00:00', $until . ' 23:59:59'])
             ->whereNotNull('lead_source')
             ->selectRaw('lead_source, COUNT(*) as total')
             ->groupBy('lead_source')
@@ -51,7 +59,7 @@ class LeadSourceRoiWidget extends Widget
             ->groupBy('leads.lead_source')
             ->pluck('avg_profit', 'lead_source');
 
-        $this->rows = $sources->map(function ($total, $source) use ($closed, $profitBySource) {
+        $this->rows = $sources->map(function ($total, $source) use ($closed, $profitBySource, $from, $until) {
             $closedCount = $closed[$source] ?? 0;
             $conversion  = $total > 0 ? round(($closedCount / $total) * 100, 1) : 0;
             $avgProfit   = isset($profitBySource[$source]) ? round((float) $profitBySource[$source], 2) : null;

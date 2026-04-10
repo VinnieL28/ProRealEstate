@@ -8,21 +8,26 @@ use Illuminate\Support\Carbon;
 
 class RevenueByMonthChart extends LineChartWidget
 {
-    protected static ?string $heading = 'Revenue (Profit) by Month — Last 12 Months';
+    protected static ?string $heading = 'Revenue (Profit) by Month';
 
     protected int | string | array $columnSpan = 'full';
 
     protected static bool $isDiscovered = false;
 
+    protected $listeners = ['report-filter-changed' => '$refresh'];
+
     protected function getData(): array
     {
         $teamId = auth()->user()?->team_id;
+        $from   = Carbon::parse(session('report_date_from', now()->subMonths(11)->startOfMonth()));
+        $until  = Carbon::parse(session('report_date_until', now()->endOfMonth()));
         $labels  = [];
         $profit  = [];
         $count   = [];
 
-        for ($i = 11; $i >= 0; $i--) {
-            $month    = Carbon::now()->subMonths($i);
+        $cursor = $from->copy()->startOfMonth();
+        while ($cursor->lte($until)) {
+            $month    = $cursor->copy();
             $labels[] = $month->format('M Y');
 
             $deals = Deal::query()
@@ -34,6 +39,7 @@ class RevenueByMonthChart extends LineChartWidget
 
             $profit[] = round((float) $deals->sum(fn ($d) => $d->profit ?? 0), 2);
             $count[]  = $deals->count();
+            $cursor->addMonth();
         }
 
         return [
