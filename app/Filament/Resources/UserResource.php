@@ -88,7 +88,7 @@ class UserResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('email')->searchable(),
+                Tables\Columns\TextColumn::make('email')->searchable()->visibleFrom('md'),
                 Tables\Columns\BadgeColumn::make('role')
                     ->colors([
                         'danger'  => 'owner',
@@ -102,10 +102,11 @@ class UserResource extends Resource
                     ->colors([
                         'success' => 'active',
                         'danger'  => 'inactive',
-                    ]),
-                Tables\Columns\TextColumn::make('team.name')->label('Team'),
-                Tables\Columns\TextColumn::make('phone'),
-                Tables\Columns\TextColumn::make('created_at')->since()->label('Joined'),
+                    ])
+                    ->visibleFrom('sm'),
+                Tables\Columns\TextColumn::make('team.name')->label('Team')->visibleFrom('md'),
+                Tables\Columns\TextColumn::make('phone')->visibleFrom('lg'),
+                Tables\Columns\TextColumn::make('created_at')->since()->label('Joined')->visibleFrom('lg'),
             ])
             ->filters([
                 SelectFilter::make('role')->options([

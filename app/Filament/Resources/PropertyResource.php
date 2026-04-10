@@ -147,12 +147,12 @@ class PropertyResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('address')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('city')->sortable(),
+                Tables\Columns\TextColumn::make('city')->sortable()->visibleFrom('md'),
                 Tables\Columns\BadgeColumn::make('status')->sortable(),
-                Tables\Columns\TextColumn::make('type'),
-                Tables\Columns\TextColumn::make('arv')->money('usd', true)->label('ARV'),
-                Tables\Columns\TextColumn::make('acquisition_price')->money('usd', true)->label('Buy'),
-                Tables\Columns\TextColumn::make('sale_price')->money('usd', true)->label('Sell'),
+                Tables\Columns\TextColumn::make('type')->visibleFrom('md'),
+                Tables\Columns\TextColumn::make('arv')->money('usd', true)->label('ARV')->visibleFrom('lg'),
+                Tables\Columns\TextColumn::make('acquisition_price')->money('usd', true)->label('Buy')->visibleFrom('lg'),
+                Tables\Columns\TextColumn::make('sale_price')->money('usd', true)->label('Sell')->visibleFrom('lg'),
             ])
             ->filters([
                 SelectFilter::make('status')->options([

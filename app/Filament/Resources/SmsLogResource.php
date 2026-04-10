@@ -43,10 +43,10 @@ class SmsLogResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('lead.owner_name')->label('Lead')->searchable(),
-                Tables\Columns\TextColumn::make('user.name')->label('By'),
-                Tables\Columns\TextColumn::make('sent_at')->dateTime(),
+                Tables\Columns\TextColumn::make('user.name')->label('By')->visibleFrom('sm'),
+                Tables\Columns\TextColumn::make('sent_at')->dateTime()->visibleFrom('md'),
                 Tables\Columns\BadgeColumn::make('direction'),
-                Tables\Columns\TextColumn::make('message')->limit(40),
+                Tables\Columns\TextColumn::make('message')->limit(40)->visibleFrom('sm'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

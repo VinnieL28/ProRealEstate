@@ -46,9 +46,9 @@ class CallLogResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('lead.owner_name')->label('Lead')->searchable(),
-                Tables\Columns\TextColumn::make('user.name')->label('By'),
-                Tables\Columns\TextColumn::make('called_at')->dateTime(),
-                Tables\Columns\TextColumn::make('duration_minutes')->label('Minutes'),
+                Tables\Columns\TextColumn::make('user.name')->label('By')->visibleFrom('sm'),
+                Tables\Columns\TextColumn::make('called_at')->dateTime()->visibleFrom('md'),
+                Tables\Columns\TextColumn::make('duration_minutes')->label('Minutes')->visibleFrom('md'),
                 Tables\Columns\BadgeColumn::make('outcome'),
             ])
             ->actions([
