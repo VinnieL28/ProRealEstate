@@ -37,6 +37,7 @@ use App\Models\CallLog;
 use App\Models\SmsLog;
 use App\Services\TwilioService;
 use App\Exports\LeadsExport;
+use App\Imports\LeadsImport;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
@@ -426,48 +427,60 @@ class LeadResource extends Resource
                         ->deselectRecordsAfterCompletion(),
 
                     Action::make('import_csv')
-                        ->label('Import CSV')
+                        ->label('Import CSV / Excel')
                         ->icon('heroicon-o-arrow-up-tray')
                         ->form([
                             FileUpload::make('file')
                                 ->required()
-                                ->acceptedFileTypes(['text/csv', 'text/plain', 'application/vnd.ms-excel'])
-                                ->directory('imports'),
+                                ->acceptedFileTypes([
+                                    'text/csv',
+                                    'text/plain',
+                                    'application/vnd.ms-excel',
+                                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                ])
+                                ->directory('imports')
+                                ->helperText('Columns: name, phone, email, lead_source, stage, motivation, property_type, suburb, notes, assigned_to'),
                         ])
                         ->action(function (array $data) {
-                            $path = $data['file'];
+                            $path     = $data['file'];
                             $fullPath = Storage::disk(config('filesystems.default'))->path($path);
-                            if (!file_exists($fullPath)) {
+                            $teamId   = auth()->user()?->team_id;
+
+                            if (!file_exists($fullPath) || !$teamId) {
+                                Notification::make()->title('Import failed: file not found or no team.')->danger()->send();
                                 return;
                             }
-                            $handle = fopen($fullPath, 'r');
-                            if (!$handle) {
-                                return;
+
+                            $import = new LeadsImport($teamId);
+                            Excel::import($import, $fullPath);
+
+                            $failCount  = count($import->failedRows);
+                            $skipCount  = $import->skipped;
+                            $importCount = $import->imported;
+
+                            // Build summary body
+                            $lines   = [];
+                            $lines[] = "{$importCount} lead(s) imported.";
+                            if ($skipCount > 0) {
+                                $lines[] = "{$skipCount} duplicate(s) skipped.";
                             }
-                            $headers = null;
-                            $imported = 0;
-                            while (($row = fgetcsv($handle)) !== false) {
-                                if ($headers === null) {
-                                    $headers = $row;
-                                    continue;
+                            if ($failCount > 0) {
+                                $lines[] = "{$failCount} row(s) failed:";
+                                foreach (array_slice($import->failedRows, 0, 5) as $f) {
+                                    $lines[] = "  Row {$f['row']}: {$f['reason']}";
                                 }
-                                $rowData = array_combine($headers, $row);
-                                if (!$rowData) {
-                                    continue;
+                                if ($failCount > 5) {
+                                    $lines[] = '  …and ' . ($failCount - 5) . ' more.';
                                 }
-                                $payload = [
-                                    'owner_name' => $rowData['owner_name'] ?? $rowData['name'] ?? null,
-                                    'email' => $rowData['email'] ?? null,
-                                    'phone' => $rowData['phone'] ?? null,
-                                    'lead_source' => $rowData['lead_source'] ?? $rowData['source'] ?? null,
-                                    'stage' => $rowData['stage'] ?? 'new_lead',
-                                    'team_id' => auth()->user()?->team_id,
-                                ];
-                                Lead::create($payload);
-                                $imported++;
                             }
-                            fclose($handle);
-                            session()->flash('notification', "Imported {$imported} lead(s).");
+
+                            $status = $failCount > 0 ? 'warning' : ($importCount > 0 ? 'success' : 'info');
+
+                            Notification::make()
+                                ->title('Import Complete')
+                                ->body(implode("\n", $lines))
+                                ->{$status}()
+                                ->send();
                         }),
                 ]),
             ]);
