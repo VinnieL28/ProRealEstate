@@ -14,8 +14,10 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
 class TaskResource extends Resource
@@ -75,8 +77,12 @@ class TaskResource extends Resource
                     'high' => 'High',
                 ]),
                 SelectFilter::make('assigned_to_id')->label('Assigned To')->options(fn () => User::orderBy('name')->pluck('name', 'id')),
-                SelectFilter::make('due_today')->label('Due Today')->query(fn ($q) => $q->whereDate('due_date', Carbon::today())),
-                SelectFilter::make('overdue')->label('Overdue')->query(fn ($q) => $q->whereDate('due_date', '<', Carbon::today())->where('status', '!=', 'done')),
+                Filter::make('due_today')
+                    ->label('Due Today')
+                    ->query(fn (Builder $query) => $query->whereDate('due_date', Carbon::today())),
+                Filter::make('overdue')
+                    ->label('Overdue')
+                    ->query(fn (Builder $query) => $query->whereDate('due_date', '<', Carbon::today())->where('status', '!=', 'done')),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

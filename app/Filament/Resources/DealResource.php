@@ -131,7 +131,7 @@ class DealResource extends Resource
                             'esign_sent_at' => now(),
                             'esign_envelope_id' => $record->esign_envelope_id ?? strtoupper(bin2hex(random_bytes(5))),
                         ]);
-                        Notification::make()->title('E-signature sent (stub)').success()->send();
+                        Notification::make()->title('E-signature sent (stub)')->success()->send();
                     }),
             ])
             ->bulkActions([

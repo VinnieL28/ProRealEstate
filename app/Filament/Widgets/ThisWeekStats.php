@@ -6,11 +6,11 @@ use App\Models\Deal;
 use App\Models\Lead;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
-use Filament\Widgets\StatsOverviewWidget\Card;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class ThisWeekStats extends BaseWidget
 {
-    protected function getCards(): array
+    protected function getStats(): array
     {
         $start = Carbon::now()->startOfWeek();
         $end = Carbon::now()->endOfWeek();
@@ -21,10 +21,10 @@ class ThisWeekStats extends BaseWidget
         $contracts = Deal::whereBetween('updated_at', [$start, $end])->where('stage', 'closed_won')->count();
 
         return [
-            Card::make('New Leads This Week', $newLeads),
-            Card::make('Appointments This Week', $appointments),
-            Card::make('Offers Made This Week', $offers),
-            Card::make('Contracts Secured This Week', $contracts),
+            Stat::make('New Leads This Week', $newLeads),
+            Stat::make('Appointments This Week', $appointments),
+            Stat::make('Offers Made This Week', $offers),
+            Stat::make('Contracts Secured This Week', $contracts),
         ];
     }
 }

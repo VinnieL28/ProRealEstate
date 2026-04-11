@@ -23,6 +23,7 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
 
 class PropertyResource extends Resource
@@ -172,7 +173,7 @@ class PropertyResource extends Resource
                     'other' => 'Other',
                 ]),
                 SelectFilter::make('city')->options(fn () => Property::query()->whereNotNull('city')->distinct()->pluck('city', 'city')->toArray()),
-                Filter::make('stale')->label('Stale (>30d no update)')->query(fn ($q) => $q->where('updated_at', '<', now()->subDays(30))),
+                Filter::make('stale')->label('Stale (>30d no update)')->query(fn (Builder $query) => $query->where('updated_at', '<', now()->subDays(30))),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

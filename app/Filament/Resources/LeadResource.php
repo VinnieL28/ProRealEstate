@@ -39,6 +39,7 @@ use App\Services\TwilioService;
 use App\Exports\LeadsExport;
 use App\Imports\LeadsImport;
 use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -280,7 +281,7 @@ class LeadResource extends Resource
                 SelectFilter::make('assigned_to_id')
                     ->label('Assigned To')
                     ->options(fn () => User::orderBy('name')->pluck('name', 'id')),
-                Filter::make('stale')->label('Stale (>14d no touch)')->query(fn ($q) => $q->where('updated_at', '<', Carbon::now()->subDays(14))),
+                Filter::make('stale')->label('Stale (>14d no touch)')->query(fn (Builder $query) => $query->where('updated_at', '<', Carbon::now()->subDays(14))),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

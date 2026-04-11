@@ -7,11 +7,11 @@ use App\Models\Lead;
 use App\Models\Task;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
-use Filament\Widgets\StatsOverviewWidget\Card;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class TodayActivity extends BaseWidget
 {
-    protected function getCards(): array
+    protected function getStats(): array
     {
         $today = Carbon::today();
         $newLeads = Lead::whereDate('created_at', $today)->count();
@@ -20,10 +20,10 @@ class TodayActivity extends BaseWidget
         $tasksDue = Task::whereDate('due_date', $today)->where('status', '!=', 'done')->count();
 
         return [
-            Card::make('New Leads Today', $newLeads),
-            Card::make('Calls Logged Today', $calls),
-            Card::make('Appointments Set Today', $appointments),
-            Card::make('Tasks Due Today', $tasksDue),
+            Stat::make('New Leads Today', $newLeads),
+            Stat::make('Calls Logged Today', $calls),
+            Stat::make('Appointments Set Today', $appointments),
+            Stat::make('Tasks Due Today', $tasksDue),
         ];
     }
 }

@@ -5,29 +5,28 @@ namespace App\Filament\Widgets;
 use App\Models\Task;
 use Carbon\Carbon;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 
 class TasksDueWidget extends BaseWidget
 {
     protected static ?string $heading = 'Tasks Due / Overdue';
 
-    protected function getTableQuery(): Builder|Relation|null
+    public function table(Table $table): Table
     {
-        return Task::query()
-            ->whereNot('status', 'done')
-            ->whereDate('due_date', '<=', Carbon::today())
-            ->orderBy('due_date');
-    }
-
-    protected function getTableColumns(): array
-    {
-        return [
-            Tables\Columns\TextColumn::make('title')->searchable(),
-            Tables\Columns\TextColumn::make('assignedTo.name')->label('Assigned'),
-            Tables\Columns\BadgeColumn::make('priority'),
-            Tables\Columns\TextColumn::make('due_date')->dateTime(),
-        ];
+        return $table
+            ->query(
+                Task::query()
+                    ->whereNot('status', 'done')
+                    ->whereDate('due_date', '<=', Carbon::today())
+                    ->orderBy('due_date')
+            )
+            ->columns([
+                Tables\Columns\TextColumn::make('title')->searchable(),
+                Tables\Columns\TextColumn::make('assignedTo.name')->label('Assigned'),
+                Tables\Columns\BadgeColumn::make('priority'),
+                Tables\Columns\TextColumn::make('due_date')->dateTime(),
+            ]);
     }
 }
