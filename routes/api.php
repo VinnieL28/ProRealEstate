@@ -6,7 +6,6 @@ use App\Http\Controllers\Api\InboundResponseController;
 use App\Http\Controllers\Api\LeadIngestionController;
 use App\Http\Controllers\Api\TwilioWebhookController;
 use App\Http\Controllers\Api\WebToLeadController;
-use App\Http\Controllers\StripeWebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,5 +37,6 @@ Route::post('/twilio/sms/incoming', [TwilioWebhookController::class, 'inboundSms
 Route::post('/twilio/call/status', [TwilioWebhookController::class, 'callStatus'])->name('twilio.call.status');
 Route::get('/twilio/twiml/voice', [TwilioWebhookController::class, 'voiceTwiml'])->name('twilio.twiml.voice');
 
-// Stripe webhook (Cashier handles signature verification)
-Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])->name('cashier.webhook');
+// Stripe webhooks are handled by the Cashier-auto-registered route at POST /stripe/webhook
+// (registered by Laravel\Cashier\CashierServiceProvider — NOT here in api.php)
+// In Stripe Dashboard, set your webhook URL to: {APP_URL}/stripe/webhook
