@@ -357,6 +357,8 @@ class LeadResource extends Resource
                         Notification::make()->title('SMS logged successfully.')->success()->send();
                     }),
             ])
+            ->defaultPaginationPageOption(25)
+            ->paginationPageOptions([25, 50, 100])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

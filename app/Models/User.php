@@ -47,6 +47,9 @@ class User extends Authenticatable
         'suburb',
         'state',
         'avatar',
+        'two_factor_secret',
+        'two_factor_enabled',
+        'two_factor_confirmed_at',
     ];
 
     /**
@@ -65,11 +68,13 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-        'dark_mode_pref' => 'boolean',
+        'email_verified_at'          => 'datetime',
+        'password'                   => 'hashed',
+        'dark_mode_pref'             => 'boolean',
         'first_login_otp_expires_at' => 'datetime',
-        'is_first_time_login' => 'boolean',
+        'is_first_time_login'        => 'boolean',
+        'two_factor_enabled'         => 'boolean',
+        'two_factor_confirmed_at'    => 'datetime',
     ];
 
     public function team(): BelongsTo
@@ -111,5 +116,10 @@ class User extends Authenticatable
     public function hasAnyRole(array $roles): bool
     {
         return $this->hasRole($roles);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
     }
 }

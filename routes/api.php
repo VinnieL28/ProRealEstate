@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\InboundResponseController;
 use App\Http\Controllers\Api\LeadIngestionController;
 use App\Http\Controllers\Api\TwilioWebhookController;
 use App\Http\Controllers\Api\WebToLeadController;
+use App\Http\Controllers\StripeWebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,3 +37,6 @@ Route::post('/twilio/sms/inbound', [TwilioWebhookController::class, 'inboundSms'
 Route::post('/twilio/sms/incoming', [TwilioWebhookController::class, 'inboundSms'])->name('twilio.sms.incoming');
 Route::post('/twilio/call/status', [TwilioWebhookController::class, 'callStatus'])->name('twilio.call.status');
 Route::get('/twilio/twiml/voice', [TwilioWebhookController::class, 'voiceTwiml'])->name('twilio.twiml.voice');
+
+// Stripe webhook (Cashier handles signature verification)
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])->name('cashier.webhook');

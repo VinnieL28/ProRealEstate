@@ -134,6 +134,8 @@ class DealResource extends Resource
                         Notification::make()->title('E-signature sent (stub)')->success()->send();
                     }),
             ])
+            ->defaultPaginationPageOption(25)
+            ->paginationPageOptions([25, 50, 100])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

@@ -13,6 +13,7 @@ use App\Filament\Widgets\KpiPerformance;
 use App\Filament\Widgets\LeaderboardWidget;
 use App\Filament\Widgets\CalendarWidget;
 use App\Filament\Widgets\HotLeadsWidget;
+use App\Filament\Widgets\OnboardingProgressWidget;
 
 class Dashboard extends BaseDashboard
 {
@@ -24,6 +25,7 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
+            OnboardingProgressWidget::class,
             DashboardStats::class,
             HotLeadsWidget::class,
             TodayActivity::class,

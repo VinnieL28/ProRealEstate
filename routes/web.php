@@ -6,20 +6,24 @@ use App\Http\Controllers\LeadController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GmailController;
+use App\Http\Controllers\LandingController;
+use App\Http\Controllers\TeamInvitationController;
+use App\Http\Controllers\TwoFactorController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
 */
 
-// Default to Filament Admin dashboard
-Route::redirect('/', '/admin')->name('dashboard.index');
+// ── Public Marketing Landing Page ──────────────────────────────────────────
+Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::get('/register', [LandingController::class, 'register'])->name('register.form');
+Route::post('/register', [LandingController::class, 'storeRegistration'])->name('register.store');
+
+// ── Team Invitations ────────────────────────────────────────────────────────
+Route::get('/invitation/{token}', [TeamInvitationController::class, 'show'])->name('invitation.accept.show');
+Route::post('/invitation/{token}', [TeamInvitationController::class, 'accept'])->name('invitation.accept');
 
 // Properties
 Route::get('/properties', [PropertyController::class, 'index'])->name('properties.index');
@@ -59,6 +63,15 @@ Route::view('/communications', 'communications.index')->name('communications.ind
 // Settings
 Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
 Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
+
+// Two-Factor Authentication
+Route::get('/2fa/challenge', [TwoFactorController::class, 'challenge'])->name('2fa.challenge')->middleware('guest');
+Route::post('/2fa/verify', [TwoFactorController::class, 'verify'])->name('2fa.verify')->middleware('guest');
+Route::middleware('auth')->group(function () {
+    Route::get('/2fa/setup', [TwoFactorController::class, 'setup'])->name('2fa.setup');
+    Route::post('/2fa/enable', [TwoFactorController::class, 'enable'])->name('2fa.enable');
+    Route::post('/2fa/disable', [TwoFactorController::class, 'disable'])->name('2fa.disable');
+});
 
 // Gmail OAuth & actions (auth required)
 Route::middleware('auth')->group(function () {

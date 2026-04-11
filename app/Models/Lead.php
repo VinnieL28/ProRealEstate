@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Events\LeadCreatedEvent;
 use App\Events\LeadStageChangedEvent;
+use App\Models\Concerns\HasTeamScope;
 use App\Notifications\HotLeadFlagged;
 use App\Notifications\NewLeadAssigned;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,10 +13,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Facades\Cache;
 
 class Lead extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTeamScope;
 
     protected $fillable = [
         'team_id',
@@ -243,6 +245,7 @@ class Lead extends Model
     protected static function booted(): void
     {
         static::created(function (Lead $lead) {
+            Cache::forget("dashboard_stats_team_{$lead->team_id}");
             LeadCreatedEvent::dispatch($lead);
 
             // Notify the assigned agent
@@ -253,6 +256,7 @@ class Lead extends Model
         });
 
         static::updated(function (Lead $lead) {
+            Cache::forget("dashboard_stats_team_{$lead->team_id}");
             $originalStage = $lead->getOriginal('stage');
             $newStage = $lead->stage;
 

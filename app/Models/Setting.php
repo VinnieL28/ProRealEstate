@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Cache;
 
 class Setting extends Model
 {
@@ -46,5 +47,24 @@ class Setting extends Model
     public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class);
+    }
+
+    /**
+     * Get (and cache) the settings for a given team. Cache is invalidated on save.
+     */
+    public static function forTeam(int $teamId): ?self
+    {
+        return Cache::rememberForever("team_settings_{$teamId}", fn () => self::where('team_id', $teamId)->first());
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(function (self $setting) {
+            Cache::forget("team_settings_{$setting->team_id}");
+        });
+
+        static::deleted(function (self $setting) {
+            Cache::forget("team_settings_{$setting->team_id}");
+        });
     }
 }
