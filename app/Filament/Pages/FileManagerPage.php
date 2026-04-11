@@ -45,9 +45,9 @@ class FileManagerPage extends Page
                 ->label('Related Record')
                 ->options(function (callable $get) {
                     return match ($get('related_type')) {
-                        'Lead' => Lead::orderBy('owner_name')->pluck('owner_name', 'id'),
-                        'Deal' => Deal::orderBy('name')->pluck('name', 'id'),
-                        'Property' => Property::orderBy('address')->pluck('address', 'id'),
+                        'Lead' => Lead::orderBy('owner_name')->whereNotNull('owner_name')->pluck('owner_name', 'id')->toArray(),
+                        'Deal' => Deal::orderBy('name')->whereNotNull('name')->pluck('name', 'id')->toArray(),
+                        'Property' => Property::orderBy('address')->whereNotNull('address')->pluck('address', 'id')->toArray(),
                         default => [],
                     };
                 })

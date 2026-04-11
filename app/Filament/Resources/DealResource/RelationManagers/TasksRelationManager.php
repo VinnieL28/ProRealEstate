@@ -23,7 +23,7 @@ class TasksRelationManager extends RelationManager
             TextInput::make('title')->required(),
             Textarea::make('description')->rows(3),
             DateTimePicker::make('due_date'),
-            Select::make('assigned_to_id')->label('Assigned To')->options(fn () => User::orderBy('name')->pluck('name', 'id'))->searchable(),
+            Select::make('assigned_to_id')->label('Assigned To')->options(fn () => User::orderBy('name')->whereNotNull('name')->pluck('name', 'id')->toArray())->searchable(),
             Select::make('status')->options([
                 'open' => 'Open',
                 'in_progress' => 'In Progress',

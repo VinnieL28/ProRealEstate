@@ -24,7 +24,7 @@ class SmsLogsRelationManager extends RelationManager
                 'inbound' => 'Inbound',
                 'outbound' => 'Outbound',
             ])->default('outbound'),
-            Select::make('user_id')->label('Logged By')->options(fn () => User::orderBy('name')->pluck('name', 'id'))->searchable(),
+            Select::make('user_id')->label('Logged By')->options(fn () => User::orderBy('name')->whereNotNull('name')->pluck('name', 'id')->toArray())->searchable(),
             Textarea::make('message')->rows(3)->required(),
             Textarea::make('notes')->rows(3),
         ]);

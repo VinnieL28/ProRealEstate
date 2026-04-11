@@ -28,7 +28,7 @@ class CallLogsRelationManager extends RelationManager
                 'spoke' => 'Spoke',
                 'follow_up' => 'Follow-up Needed',
             ])->default('no_answer'),
-            Select::make('user_id')->label('Logged By')->options(fn () => User::orderBy('name')->pluck('name', 'id'))->searchable(),
+            Select::make('user_id')->label('Logged By')->options(fn () => User::orderBy('name')->whereNotNull('name')->pluck('name', 'id')->toArray())->searchable(),
             Textarea::make('notes')->rows(3),
         ]);
     }

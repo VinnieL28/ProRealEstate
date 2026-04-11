@@ -35,7 +35,7 @@ class TaskResource extends Resource
                 TextInput::make('title')->required(),
                 Textarea::make('description')->rows(3),
                 DateTimePicker::make('due_date'),
-                Select::make('assigned_to_id')->label('Assigned To')->options(fn () => User::orderBy('name')->pluck('name', 'id'))->searchable(),
+                Select::make('assigned_to_id')->label('Assigned To')->options(fn () => User::orderBy('name')->whereNotNull('name')->pluck('name', 'id')->toArray())->searchable(),
                 Select::make('related_type')->options([
                     'Lead' => 'Lead',
                     'Deal' => 'Deal',
@@ -76,7 +76,7 @@ class TaskResource extends Resource
                     'medium' => 'Medium',
                     'high' => 'High',
                 ]),
-                SelectFilter::make('assigned_to_id')->label('Assigned To')->options(fn () => User::orderBy('name')->pluck('name', 'id')),
+                SelectFilter::make('assigned_to_id')->label('Assigned To')->options(fn () => User::orderBy('name')->whereNotNull('name')->pluck('name', 'id')->toArray()),
                 Filter::make('due_today')
                     ->label('Due Today')
                     ->query(fn (Builder $query) => $query->whereDate('due_date', Carbon::today())),
@@ -98,7 +98,7 @@ class TaskResource extends Resource
                         ->form([
                             Select::make('assigned_to_id')
                                 ->label('Reassign To')
-                                ->options(fn () => User::orderBy('name')->pluck('name', 'id'))
+                                ->options(fn () => User::orderBy('name')->whereNotNull('name')->pluck('name', 'id')->toArray())
                                 ->required()
                                 ->searchable(),
                         ])

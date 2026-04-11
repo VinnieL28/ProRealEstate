@@ -45,15 +45,15 @@ class DocumentResource extends Resource
                     ->required(),
                 Select::make('lead_id')
                     ->label('Lead / Seller')
-                    ->options(fn () => Lead::orderBy('owner_name')->pluck('owner_name', 'id'))
+                    ->options(fn () => Lead::orderBy('owner_name')->whereNotNull('owner_name')->pluck('owner_name', 'id')->toArray())
                     ->searchable(),
                 Select::make('deal_id')
                     ->label('Deal')
-                    ->options(fn () => Deal::orderBy('name')->pluck('name', 'id'))
+                    ->options(fn () => Deal::orderBy('name')->whereNotNull('name')->pluck('name', 'id')->toArray())
                     ->searchable(),
                 Select::make('property_id')
                     ->label('Property')
-                    ->options(fn () => Property::orderBy('address')->pluck('address', 'id'))
+                    ->options(fn () => Property::orderBy('address')->whereNotNull('address')->pluck('address', 'id')->toArray())
                     ->searchable(),
             ]),
         ]);

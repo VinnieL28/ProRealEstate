@@ -54,8 +54,8 @@ class DealResource extends Resource
             ->schema([
                 Section::make('Deal')->columns(2)->schema([
                     TextInput::make('name')->required(),
-                    Select::make('property_id')->label('Property')->options(fn () => Property::orderBy('address')->pluck('address', 'id'))->searchable()->required(),
-                    Select::make('lead_id')->label('Seller Lead')->options(fn () => Lead::orderBy('owner_name')->pluck('owner_name', 'id'))->searchable(),
+                    Select::make('property_id')->label('Property')->options(fn () => Property::orderBy('address')->whereNotNull('address')->pluck('address', 'id')->toArray())->searchable()->required(),
+                    Select::make('lead_id')->label('Seller Lead')->options(fn () => Lead::orderBy('owner_name')->whereNotNull('owner_name')->pluck('owner_name', 'id')->toArray())->searchable(),
                     Select::make('contract_type')->options([
                         'assignment' => 'Assignment',
                         'double_close' => 'Double Close',

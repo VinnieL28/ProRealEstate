@@ -27,8 +27,8 @@ class CallLogResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Select::make('lead_id')->options(fn () => Lead::orderBy('owner_name')->pluck('owner_name', 'id'))->searchable()->required(),
-            Select::make('user_id')->label('Logged By')->options(fn () => User::orderBy('name')->pluck('name', 'id'))->searchable(),
+            Select::make('lead_id')->options(fn () => Lead::orderBy('owner_name')->whereNotNull('owner_name')->pluck('owner_name', 'id')->toArray())->searchable()->required(),
+            Select::make('user_id')->label('Logged By')->options(fn () => User::orderBy('name')->whereNotNull('name')->pluck('name', 'id')->toArray())->searchable(),
             DateTimePicker::make('called_at')->required(),
             TextInput::make('duration_minutes')->numeric()->label('Duration (minutes)'),
             Select::make('outcome')->options([

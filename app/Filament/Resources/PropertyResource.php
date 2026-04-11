@@ -136,8 +136,8 @@ class PropertyResource extends Resource
                     TextInput::make('holding_period_days')->numeric(),
                 ]),
                 Forms\Components\Section::make('Relationships')->columns(2)->schema([
-                    Select::make('lead_id')->label('Seller Lead')->options(fn () => Lead::orderBy('owner_name')->pluck('owner_name', 'id'))->searchable(),
-                    Select::make('active_deal_id')->label('Active Deal')->options(fn () => Deal::orderBy('name')->pluck('name', 'id'))->searchable(),
+                    Select::make('lead_id')->label('Seller Lead')->options(fn () => Lead::orderBy('owner_name')->whereNotNull('owner_name')->pluck('owner_name', 'id')->toArray())->searchable(),
+                    Select::make('active_deal_id')->label('Active Deal')->options(fn () => Deal::orderBy('name')->whereNotNull('name')->pluck('name', 'id')->toArray())->searchable(),
                 ]),
                 Textarea::make('notes')->rows(4),
             ]);

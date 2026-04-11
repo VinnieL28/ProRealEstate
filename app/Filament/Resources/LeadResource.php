@@ -93,11 +93,11 @@ class LeadResource extends Resource
                     TextInput::make('major_market')->label('Major Market'),
                     Select::make('assigned_to_id')
                         ->label('Assigned To')
-                        ->options(fn () => User::orderBy('name')->pluck('name', 'id'))
+                        ->options(fn () => User::orderBy('name')->whereNotNull('name')->pluck('name', 'id')->toArray())
                         ->searchable(),
                     Select::make('active_deal_id')
                         ->label('Active Deal')
-                        ->options(fn () => Deal::orderBy('name')->pluck('name', 'id'))
+                        ->options(fn () => Deal::orderBy('name')->whereNotNull('name')->pluck('name', 'id')->toArray())
                         ->searchable(),
                     Select::make('stage')
                         ->required()
@@ -280,7 +280,7 @@ class LeadResource extends Resource
                 ]),
                 SelectFilter::make('assigned_to_id')
                     ->label('Assigned To')
-                    ->options(fn () => User::orderBy('name')->pluck('name', 'id')),
+                    ->options(fn () => User::orderBy('name')->whereNotNull('name')->pluck('name', 'id')->toArray()),
                 Filter::make('stale')->label('Stale (>14d no touch)')->query(fn (Builder $query) => $query->where('updated_at', '<', Carbon::now()->subDays(14))),
             ])
             ->actions([
@@ -386,7 +386,7 @@ class LeadResource extends Resource
                         ->form([
                             Select::make('assigned_to_id')
                                 ->label('Reassign To')
-                                ->options(fn () => User::orderBy('name')->pluck('name', 'id'))
+                                ->options(fn () => User::orderBy('name')->whereNotNull('name')->pluck('name', 'id')->toArray())
                                 ->required(),
                         ])
                         ->action(function ($records, array $data) {

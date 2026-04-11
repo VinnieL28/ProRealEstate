@@ -56,7 +56,7 @@ class UserResource extends Resource
                     ->default('cold_caller'),
                 Select::make('team_id')
                     ->label('Team')
-                    ->options(fn () => Team::orderBy('name')->pluck('name', 'id'))
+                    ->options(fn () => Team::orderBy('name')->whereNotNull('name')->pluck('name', 'id')->toArray())
                     ->searchable(),
                 Select::make('status')
                     ->options([
@@ -123,7 +123,7 @@ class UserResource extends Resource
                 ]),
                 SelectFilter::make('team_id')
                     ->label('Team')
-                    ->options(fn () => Team::orderBy('name')->pluck('name', 'id')),
+                    ->options(fn () => Team::orderBy('name')->whereNotNull('name')->pluck('name', 'id')->toArray()),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

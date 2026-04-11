@@ -26,8 +26,8 @@ class SmsLogResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Select::make('lead_id')->options(fn () => Lead::orderBy('owner_name')->pluck('owner_name', 'id'))->searchable()->required(),
-            Select::make('user_id')->label('Logged By')->options(fn () => User::orderBy('name')->pluck('name', 'id'))->searchable(),
+            Select::make('lead_id')->options(fn () => Lead::orderBy('owner_name')->whereNotNull('owner_name')->pluck('owner_name', 'id')->toArray())->searchable()->required(),
+            Select::make('user_id')->label('Logged By')->options(fn () => User::orderBy('name')->whereNotNull('name')->pluck('name', 'id')->toArray())->searchable(),
             DateTimePicker::make('sent_at')->required(),
             Select::make('direction')->options([
                 'inbound' => 'Inbound',
