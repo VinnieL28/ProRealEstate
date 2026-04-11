@@ -161,6 +161,86 @@ class GmailService
     }
 
     /**
+     * Pull Gmail messages matching a specific lead email and link them to the lead.
+     * Returns the number of new emails imported.
+     */
+    public function syncLeadEmails(int $teamId, int $leadId, string $leadEmail): int
+    {
+        $setting = Setting::where('team_id', $teamId)->first();
+        if (!$setting) {
+            return 0;
+        }
+
+        $token = $this->getAccessToken($setting);
+        if (!$token) {
+            return 0;
+        }
+
+        try {
+            $listResponse = $this->client->get('https://gmail.googleapis.com/gmail/v1/users/me/messages', [
+                'headers' => ['Authorization' => 'Bearer ' . $token],
+                'query'   => [
+                    'maxResults' => 30,
+                    'q'          => "from:{$leadEmail} OR to:{$leadEmail}",
+                ],
+            ]);
+
+            $listData = json_decode($listResponse->getBody()->getContents(), true);
+            $messages = $listData['messages'] ?? [];
+            $imported = 0;
+
+            foreach ($messages as $msgMeta) {
+                $msgId = $msgMeta['id'];
+
+                if (EmailLog::where('team_id', $teamId)->where('meta->gmail_id', $msgId)->exists()) {
+                    continue;
+                }
+
+                $msgResponse = $this->client->get(
+                    "https://gmail.googleapis.com/gmail/v1/users/me/messages/{$msgId}",
+                    [
+                        'headers' => ['Authorization' => 'Bearer ' . $token],
+                        'query'   => ['format' => 'metadata', 'metadataHeaders' => ['From', 'To', 'Subject', 'Date']],
+                    ]
+                );
+
+                $msg     = json_decode($msgResponse->getBody()->getContents(), true);
+                $headers = collect($msg['payload']['headers'] ?? []);
+
+                $subject = $headers->firstWhere('name', 'Subject')['value'] ?? '(no subject)';
+                $from    = $headers->firstWhere('name', 'From')['value'] ?? '';
+                $to      = $headers->firstWhere('name', 'To')['value'] ?? '';
+                $dateStr = $headers->firstWhere('name', 'Date')['value'] ?? null;
+                $snippet = $msg['snippet'] ?? '';
+                $sentAt  = $dateStr ? \Carbon\Carbon::parse($dateStr) : now();
+
+                // Determine direction based on From address
+                $direction = str_contains(strtolower($from), strtolower($leadEmail)) ? 'inbound' : 'outbound';
+
+                EmailLog::create([
+                    'team_id'      => $teamId,
+                    'user_id'      => null,
+                    'lead_id'      => $leadId,
+                    'direction'    => $direction,
+                    'subject'      => $subject,
+                    'from_address' => $from,
+                    'to_address'   => $to,
+                    'body_preview' => $snippet,
+                    'sent_at'      => $sentAt,
+                    'meta'         => ['gmail_id' => $msgId, 'thread_id' => $msg['threadId'] ?? null],
+                ]);
+
+                $imported++;
+            }
+
+            return $imported;
+        } catch (RequestException $e) {
+            Log::error('GmailService syncLeadEmails failed: ' . $e->getMessage());
+            return 0;
+        }
+    }
+
+    /**
      * Build the Google OAuth2 authorization URL.
      */
     public function getAuthUrl(Setting $setting, string $redirectUri): string
