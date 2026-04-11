@@ -243,6 +243,11 @@ class LeadResource extends Resource
                         'gray'    => fn ($state) => $state === null,
                     ])
                     ->hiddenOn('sm'),
+                Tables\Columns\TextColumn::make('properties_count')
+                    ->label('Props')
+                    ->counts('properties')
+                    ->sortable()
+                    ->hiddenOn(['sm', 'md']),
                 Tables\Columns\TextColumn::make('assignedTo.name')->label('Assigned')->sortable()->hiddenOn('sm'),
                 Tables\Columns\TextColumn::make('updated_at')->since()->label('Last touch')->hiddenOn('sm'),
                 Tables\Columns\TextColumn::make('created_at')->dateTime('M d, Y')->label('Created')->hiddenOn(['sm', 'md']),

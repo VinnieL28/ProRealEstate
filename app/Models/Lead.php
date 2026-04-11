@@ -210,6 +210,36 @@ class Lead extends Model
         return $this->hasMany(EmailLog::class);
     }
 
+    /**
+     * Query for properties that auto-match this lead's budget and location.
+     * Matches when: ARV (or asking_price) ≤ lead.max_offer AND city/market overlaps.
+     */
+    public function matchedPropertiesQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = Property::where('team_id', $this->team_id)
+            ->where('id', '!=', 0); // base query
+
+        // Budget match: property ARV should be within lead's budget range
+        if ($this->max_offer) {
+            $query->where(function ($q) {
+                $q->whereNull('arv')
+                  ->orWhere('arv', '<=', $this->max_offer * 1.1); // 10% tolerance
+            });
+        }
+
+        // Location match: city or market overlap
+        if ($this->major_market) {
+            $market = $this->major_market;
+            $query->where(function ($q) use ($market) {
+                $q->where('city', 'like', '%' . $market . '%')
+                  ->orWhere('state', 'like', '%' . $market . '%')
+                  ->orWhere('address', 'like', '%' . $market . '%');
+            });
+        }
+
+        return $query;
+    }
+
     protected static function booted(): void
     {
         static::created(function (Lead $lead) {
