@@ -68,10 +68,10 @@ class LeadsImport implements ToCollection, WithHeadingRow, SkipsOnFailure
                 continue;
             }
 
-            // Validate stage
+            // Validate stage — must match Lead model enum values
             $validStages = [
-                'new_lead', 'contacted', 'qualified', 'follow_up',
-                'appointment_set', 'negotiation', 'under_contract',
+                'new_lead', 'no_contact', 'contact_made', 'appointment_set',
+                'due_diligence', 'offer_made', 'under_contract',
                 'closed_won', 'closed_lost',
             ];
             $stage = $r->get('stage') ?: 'new_lead';
@@ -96,9 +96,8 @@ class LeadsImport implements ToCollection, WithHeadingRow, SkipsOnFailure
                 'phone'             => $phone ?: null,
                 'lead_source'       => $r->get('lead_source') ?? $r->get('source') ?? null,
                 'stage'             => $stage,
-                'motivation'        => $r->get('motivation') ? (int) $r->get('motivation') : null,
-                'property_type'     => $r->get('property_type') ?? null,
-                'suburb'            => $r->get('suburb') ?? $r->get('city') ?? null,
+                'motivation_level'  => $r->get('motivation_level') ?? ($r->get('motivation') ? (int) $r->get('motivation') : null),
+                'major_market'      => $r->get('major_market') ?? $r->get('suburb') ?? $r->get('city') ?? null,
                 'notes'             => $r->get('notes') ?? null,
                 'assigned_to_id'    => $assignedToId,
                 'team_id'           => $this->teamId,

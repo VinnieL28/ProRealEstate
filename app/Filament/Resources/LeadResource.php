@@ -447,7 +447,7 @@ class LeadResource extends Resource
                                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                                 ])
                                 ->directory('imports')
-                                ->helperText('Columns: name, phone, email, lead_source, stage, motivation, property_type, suburb, notes, assigned_to'),
+                                ->helperText('Columns: name, phone, email, lead_source, stage (new_lead/no_contact/contact_made/appointment_set/due_diligence/offer_made/under_contract/closed_won/closed_lost), motivation_level (1-5), major_market, notes, assigned_to'),
                         ])
                         ->action(function (array $data) {
                             $path     = $data['file'];
