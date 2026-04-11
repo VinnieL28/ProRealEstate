@@ -33,4 +33,6 @@ Route::post('/drip/inbound-response', [InboundResponseController::class, 'store'
 
 // Twilio webhooks (no CSRF, no auth — Twilio signs requests)
 Route::post('/twilio/sms/inbound', [TwilioWebhookController::class, 'inboundSms'])->name('twilio.sms.inbound');
+Route::post('/twilio/sms/incoming', [TwilioWebhookController::class, 'inboundSms'])->name('twilio.sms.incoming');
 Route::post('/twilio/call/status', [TwilioWebhookController::class, 'callStatus'])->name('twilio.call.status');
+Route::get('/twilio/twiml/voice', [TwilioWebhookController::class, 'voiceTwiml'])->name('twilio.twiml.voice');
