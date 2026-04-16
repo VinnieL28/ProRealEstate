@@ -11,6 +11,7 @@ use App\Observers\ContactObserver;
 use App\Observers\SellerLeadObserver;
 use App\Observers\TransactionObserver;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Livewire::component('ai-chat', \App\Livewire\AiChat::class);
+
         Contact::observe(ContactObserver::class);
         ColdLead::observe(ColdLeadObserver::class);
         SellerLead::observe(SellerLeadObserver::class);

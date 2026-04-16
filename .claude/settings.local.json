@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -r 'protected $schedule\\\\|protected $commands' /c/Users/GL/Desktop/PROJECTS/real-estate-app-v10/app/Console/Kernel.php)",
+      "Bash(composer show *)"
+    ]
+  }
+}
