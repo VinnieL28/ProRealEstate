@@ -10,6 +10,7 @@ use App\Models\Task;
 use App\Services\TwilioService;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Support\Enums\MaxWidth;
 
 class LeadKanban extends Page
 {
@@ -19,6 +20,11 @@ class LeadKanban extends Page
     protected static ?string $slug = 'lead-kanban';
     protected static string $view = 'filament.pages.lead-kanban';
     protected static ?int $navigationSort = 20;
+
+    public function getMaxContentWidth(): MaxWidth
+    {
+        return MaxWidth::Full;
+    }
 
     /** @var array<string, array{label:string, leads:\Illuminate\Support\Collection}> */
     public array $columns = [];

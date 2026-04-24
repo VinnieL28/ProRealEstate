@@ -7,6 +7,7 @@ use App\Models\Deal;
 use App\Models\Task;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Support\Enums\MaxWidth;
 
 class DealKanban extends Page
 {
@@ -16,6 +17,11 @@ class DealKanban extends Page
     protected static ?string $slug = 'deal-kanban';
     protected static string $view = 'filament.pages.deal-kanban';
     protected static ?int $navigationSort = 5;
+
+    public function getMaxContentWidth(): MaxWidth
+    {
+        return MaxWidth::Full;
+    }
 
     /** @var array<string, array{label:string, deals:\Illuminate\Support\Collection}> */
     public array $columns = [];
