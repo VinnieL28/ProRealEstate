@@ -10,6 +10,7 @@ use App\Models\Lead;
 use App\Models\Property;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -81,6 +82,17 @@ class DealResource extends Resource
                     TextInput::make('closing_costs')->numeric(),
                     TextInput::make('marketing_costs')->numeric(),
                 ]),
+                Section::make('E-Signature')->columns(3)->schema([
+                    Select::make('esign_status')->label('Status')->options([
+                        'not_sent' => 'Not Sent',
+                        'sent'     => 'Sent',
+                        'viewed'   => 'Viewed',
+                        'signed'   => 'Signed',
+                        'declined' => 'Declined',
+                    ])->default('not_sent'),
+                    TextInput::make('esign_envelope_id')->label('Envelope / Ref ID'),
+                    DateTimePicker::make('esign_sent_at')->label('Sent At'),
+                ])->collapsed(),
             ]);
     }
 
@@ -97,6 +109,13 @@ class DealResource extends Resource
                 Tables\Columns\TextColumn::make('profit')->money('usd', true)->label('Profit'),
                 Tables\Columns\TextColumn::make('roi')->suffix('%')->label('ROI')->hiddenOn(['sm', 'md']),
                 Tables\Columns\TextColumn::make('closing_date')->date()->hiddenOn('sm'),
+                Tables\Columns\BadgeColumn::make('esign_status')->label('eSign')->color(fn ($state) => match ($state) {
+                    'signed'   => 'success',
+                    'sent'     => 'warning',
+                    'viewed'   => 'info',
+                    'declined' => 'danger',
+                    default    => 'gray',
+                })->hiddenOn('sm'),
             ])
             ->filters([
                 SelectFilter::make('stage')->options([
@@ -121,17 +140,28 @@ class DealResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\Action::make('send_esign')
-                    ->label('Send for Signature')
+                    ->label('Request Signature')
                     ->icon('heroicon-o-document-text')
+                    ->color('warning')
                     ->requiresConfirmation()
+                    ->visible(fn (Deal $record) => !in_array($record->esign_status, ['sent', 'signed']))
                     ->action(function (Deal $record) {
                         $record->update([
-                            'esign_provider' => 'docusign',
-                            'esign_status' => 'sent',
-                            'esign_sent_at' => now(),
-                            'esign_envelope_id' => $record->esign_envelope_id ?? strtoupper(bin2hex(random_bytes(5))),
+                            'esign_status'      => 'sent',
+                            'esign_sent_at'     => now(),
+                            'esign_envelope_id' => $record->esign_envelope_id ?? strtoupper(bin2hex(random_bytes(6))),
                         ]);
-                        Notification::make()->title('E-signature sent (stub)')->success()->send();
+                        Notification::make()->title('Contract marked as sent for signature')->success()->send();
+                    }),
+                Tables\Actions\Action::make('mark_signed')
+                    ->label('Mark Signed')
+                    ->icon('heroicon-o-check-badge')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->visible(fn (Deal $record) => $record->esign_status === 'sent')
+                    ->action(function (Deal $record) {
+                        $record->update(['esign_status' => 'signed']);
+                        Notification::make()->title('Contract marked as signed')->success()->send();
                     }),
             ])
             ->defaultPaginationPageOption(25)

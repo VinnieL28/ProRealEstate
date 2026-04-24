@@ -9,75 +9,79 @@ use App\Models\Property;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Storage;
 
-class FileManagerPage extends Page
+class FileManagerPage extends Page implements HasForms
 {
+    use InteractsWithForms;
+
     protected static ?string $navigationIcon = 'heroicon-o-folder-open';
     protected static ?string $navigationGroup = 'Productivity';
     protected static string $view = 'filament.pages.file-manager';
 
-    public array $attachments;
+    public array $attachments = [];
 
-    public ?string $related_type = null;
-    public ?int $related_id = null;
-    public ?string $name = null;
-    public mixed $file = null;
+    public array $data = [];
 
     public function mount(): void
     {
+        $this->form->fill();
         $this->loadAttachments();
     }
 
-    protected function getFormSchema(): array
+    public function form(Form $form): Form
     {
-        return [
-            TextInput::make('name')->label('File Name')->required(),
-            Select::make('related_type')->options([
-                'Lead' => 'Lead',
-                'Deal' => 'Deal',
-                'Property' => 'Property',
-            ])->required(),
-            Select::make('related_id')
-                ->label('Related Record')
-                ->options(function (callable $get) {
-                    return match ($get('related_type')) {
-                        'Lead' => Lead::orderBy('owner_name')->whereNotNull('owner_name')->pluck('owner_name', 'id')->toArray(),
-                        'Deal' => Deal::orderBy('name')->whereNotNull('name')->pluck('name', 'id')->toArray(),
-                        'Property' => Property::orderBy('address')->whereNotNull('address')->pluck('address', 'id')->toArray(),
-                        default => [],
-                    };
-                })
-                ->searchable()
-                ->required(),
-            FileUpload::make('file')
-                ->disk(config('filesystems.default'))
-                ->directory('attachments')
-                ->required(),
-        ];
+        return $form
+            ->schema([
+                TextInput::make('name')->label('File Name')->required(),
+                Select::make('related_type')->options([
+                    'Lead' => 'Lead',
+                    'Deal' => 'Deal',
+                    'Property' => 'Property',
+                ])->required()->reactive(),
+                Select::make('related_id')
+                    ->label('Related Record')
+                    ->options(function (callable $get) {
+                        return match ($get('related_type')) {
+                            'Lead' => Lead::orderBy('owner_name')->whereNotNull('owner_name')->pluck('owner_name', 'id')->toArray(),
+                            'Deal' => Deal::orderBy('name')->whereNotNull('name')->pluck('name', 'id')->toArray(),
+                            'Property' => Property::orderBy('address')->whereNotNull('address')->pluck('address', 'id')->toArray(),
+                            default => [],
+                        };
+                    })
+                    ->searchable()
+                    ->required(),
+                FileUpload::make('file')
+                    ->disk(config('filesystems.default'))
+                    ->directory('attachments')
+                    ->required(),
+            ])
+            ->statePath('data');
     }
 
     public function upload(): void
     {
         $data = $this->form->getState();
-        $path = $data['file'];
+        $path = is_array($data['file']) ? array_values($data['file'])[0] : $data['file'];
 
         Attachment::create([
-            'team_id' => auth()->user()?->team_id,
+            'team_id'      => auth()->user()?->team_id,
             'related_type' => $data['related_type'],
-            'related_id' => $data['related_id'],
-            'name' => $data['name'],
-            'path' => $path,
-            'mime_type' => Storage::mimeType($path),
-            'size' => Storage::size($path),
-            'uploaded_by' => auth()->id(),
+            'related_id'   => $data['related_id'],
+            'name'         => $data['name'],
+            'path'         => $path,
+            'mime_type'    => Storage::mimeType($path),
+            'size'         => Storage::size($path),
+            'uploaded_by'  => auth()->id(),
         ]);
 
         Notification::make()->title('File uploaded')->success()->send();
-        $this->reset(['related_type', 'related_id', 'name', 'file']);
+        $this->form->fill();
         $this->loadAttachments();
     }
 
@@ -90,15 +94,5 @@ class FileManagerPage extends Page
             ->limit(50)
             ->get()
             ->toArray();
-    }
-
-    protected function getFormModel(): string
-    {
-        return Attachment::class;
-    }
-
-    public function form(Form $form): Form
-    {
-        return $form->schema($this->getFormSchema());
     }
 }

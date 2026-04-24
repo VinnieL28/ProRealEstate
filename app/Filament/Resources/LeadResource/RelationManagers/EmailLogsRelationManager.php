@@ -42,7 +42,7 @@ class EmailLogsRelationManager extends RelationManager
         return $table
             ->columns([
                 Tables\Columns\BadgeColumn::make('direction')
-                    ->colors(['success' => 'outbound', 'info' => 'inbound']),
+                    ->color(fn ($state) => match($state) { 'outbound' => 'success', 'inbound' => 'info', default => 'gray' }),
                 Tables\Columns\TextColumn::make('subject')->limit(60)->searchable(),
                 Tables\Columns\TextColumn::make('from_address')->label('From')->limit(40),
                 Tables\Columns\TextColumn::make('to_address')->label('To')->limit(40),

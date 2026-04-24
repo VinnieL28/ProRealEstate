@@ -71,7 +71,7 @@ class DealKanban extends Page
     /**
      * Called by SortableJS via Livewire when a card is dragged to a new stage column.
      */
-    public function moveCard(int $dealId, string $newStage): void
+    public function moveCard(?int $dealId, string $newStage): void
     {
         $user = auth()->user();
         $deal = Deal::where('id', $dealId)

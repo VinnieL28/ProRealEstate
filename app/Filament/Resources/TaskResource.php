@@ -8,6 +8,7 @@ use App\Models\User;
 use Filament\Notifications\Notification;
 use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -52,6 +53,7 @@ class TaskResource extends Resource
                     'medium' => 'Medium',
                     'high' => 'High',
                 ])->default('medium'),
+                Hidden::make('team_id')->default(fn () => auth()->user()?->team_id),
             ]);
     }
 

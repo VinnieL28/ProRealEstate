@@ -8,15 +8,17 @@ use App\Events\LeadStageChangedEvent;
 use App\Models\Lead;
 use App\Models\Task;
 use App\Models\WorkflowRule;
+use App\Services\LeadDistributionService;
 use App\Services\TwilioService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 
-class WorkflowEngine implements ShouldQueue
+class WorkflowEngine
 {
     public function handleLeadCreated(LeadCreatedEvent $event): void
     {
+        app(LeadDistributionService::class)->assign($event->lead);
         $this->runRules('lead_created', $event->lead->team_id, ['lead' => $event->lead]);
     }
 

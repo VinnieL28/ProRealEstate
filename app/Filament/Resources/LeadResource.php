@@ -126,6 +126,7 @@ class LeadResource extends Resource
                         ->nullable(),
                 ]),
             Section::make('Financials')->columns(3)->schema([
+                TextInput::make('score')->numeric()->minValue(0)->maxValue(100)->default(0)->helperText('0–100'),
                 TextInput::make('asking_price')->numeric(),
                 TextInput::make('max_offer')->numeric(),
                 TextInput::make('last_offer')->numeric(),
@@ -209,20 +210,22 @@ class LeadResource extends Resource
                 Tables\Columns\TextColumn::make('phone')->searchable()->hiddenOn('sm'),
                 Tables\Columns\TextColumn::make('lead_source')->sortable()->hiddenOn('sm'),
                 Tables\Columns\TextColumn::make('major_market')->label('Market')->hiddenOn(['sm', 'md']),
-                Tables\Columns\BadgeColumn::make('stage')->colors([
-                    'primary' => 'new_lead',
-                    'warning' => 'no_contact',
-                    'info' => 'contact_made',
-                    'success' => 'closed_won',
-                    'danger' => 'closed_lost',
-                ])->label('Stage')->sortable(),
+                Tables\Columns\BadgeColumn::make('stage')
+                    ->color(fn ($state) => match($state) {
+                        'new_lead'    => 'primary',
+                        'no_contact'  => 'warning',
+                        'contact_made'=> 'info',
+                        'closed_won'  => 'success',
+                        'closed_lost' => 'danger',
+                        default       => 'gray',
+                    })->label('Stage')->sortable(),
                 Tables\Columns\BadgeColumn::make('motivation_level')
                     ->label('Motivation')
-                    ->colors([
-                        'gray'    => fn ($state) => $state <= 2,
-                        'warning' => fn ($state) => $state === 3,
-                        'danger'  => fn ($state) => $state >= 4,
-                    ])
+                    ->color(fn ($state) => match(true) {
+                        $state >= 4  => 'danger',
+                        $state === 3 => 'warning',
+                        default      => 'gray',
+                    })
                     ->formatStateUsing(fn ($state) => match ((int) $state) {
                         1 => '● 1',
                         2 => '● 2',
@@ -236,12 +239,12 @@ class LeadResource extends Resource
                     ->label('Score')
                     ->sortable()
                     ->formatStateUsing(fn ($state) => $state ? $state . '/100' : '—')
-                    ->colors([
-                        'success' => fn ($state) => $state >= 70,
-                        'warning' => fn ($state) => $state >= 40 && $state < 70,
-                        'danger'  => fn ($state) => $state !== null && $state < 40,
-                        'gray'    => fn ($state) => $state === null,
-                    ])
+                    ->color(fn ($state) => match(true) {
+                        $state >= 70          => 'success',
+                        $state >= 40          => 'warning',
+                        $state !== null       => 'danger',
+                        default               => 'gray',
+                    })
                     ->hiddenOn('sm'),
                 Tables\Columns\TextColumn::make('properties_count')
                     ->label('Props')

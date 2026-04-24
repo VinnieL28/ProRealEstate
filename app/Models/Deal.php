@@ -29,11 +29,16 @@ class Deal extends Model
         'profit',
         'roi',
         'stage',
+        'esign_status',
+        'esign_sent_at',
+        'esign_envelope_id',
+        'esign_provider',
     ];
 
     protected $casts = [
-        'contract_date' => 'date',
-        'closing_date' => 'date',
+        'contract_date'  => 'date',
+        'closing_date'   => 'date',
+        'esign_sent_at'  => 'datetime',
         'purchase_price' => 'decimal:2',
         'assignment_fee' => 'decimal:2',
         'sale_price' => 'decimal:2',

@@ -40,7 +40,7 @@ class SmsLogsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('sent_at')->dateTime()->sortable(),
                 Tables\Columns\TextColumn::make('user.name')->label('By'),
                 Tables\Columns\BadgeColumn::make('direction')
-                    ->colors(['success' => 'outbound', 'info' => 'inbound']),
+                    ->color(fn ($state) => match($state) { 'outbound' => 'success', 'inbound' => 'info', default => 'gray' }),
                 Tables\Columns\TextColumn::make('message')->limit(60)->wrap(),
             ])
             ->defaultSort('sent_at', 'desc')

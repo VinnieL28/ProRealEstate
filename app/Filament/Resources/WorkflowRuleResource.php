@@ -99,11 +99,11 @@ class WorkflowRuleResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
-                Tables\Columns\BadgeColumn::make('trigger')->formatStateUsing(fn ($s) => match ($s) {
+                Tables\Columns\BadgeColumn::make('trigger')->formatStateUsing(fn ($state) => match ($state) {
                     'lead_created'  => 'Lead Created',
                     'stage_changed' => 'Stage Changed',
                     'deal_closed'   => 'Deal Closed',
-                    default => $s,
+                    default => $state,
                 }),
                 Tables\Columns\IconColumn::make('is_active')->boolean()->label('Active'),
                 Tables\Columns\TextColumn::make('updated_at')->since()->label('Updated'),

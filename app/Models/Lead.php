@@ -281,7 +281,7 @@ class Lead extends Model
                     'related_type' => 'Lead',
                     'related_id' => $lead->id,
                     'type' => 'status_change',
-                    'description' => "Stage changed from {$originalStage} to {$newStage}",
+                    'description' => "Stage changed from " . ($originalStage ?: 'new') . " to {$newStage}",
                 ]);
 
                 if ($newStage === 'under_contract') {

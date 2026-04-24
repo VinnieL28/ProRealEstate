@@ -90,19 +90,20 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('email')->searchable()->visibleFrom('md'),
                 Tables\Columns\BadgeColumn::make('role')
-                    ->colors([
-                        'danger'  => 'owner',
-                        'warning' => 'admin',
-                        'info'    => 'acquisition_manager',
-                        'primary' => 'lead_manager',
-                        'gray'    => 'cold_caller',
-                        'success' => 'dispo_manager',
-                    ]),
+                    ->color(fn ($state) => match($state) {
+                        'owner'               => 'danger',
+                        'admin'               => 'warning',
+                        'acquisition_manager' => 'info',
+                        'lead_manager'        => 'primary',
+                        'dispo_manager'       => 'success',
+                        default               => 'gray',
+                    }),
                 Tables\Columns\BadgeColumn::make('status')
-                    ->colors([
-                        'success' => 'active',
-                        'danger'  => 'inactive',
-                    ])
+                    ->color(fn ($state) => match($state) {
+                        'active'   => 'success',
+                        'inactive' => 'danger',
+                        default    => 'gray',
+                    })
                     ->visibleFrom('sm'),
                 Tables\Columns\TextColumn::make('team.name')->label('Team')->visibleFrom('md'),
                 Tables\Columns\TextColumn::make('phone')->visibleFrom('lg'),

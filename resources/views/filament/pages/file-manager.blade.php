@@ -1,4 +1,4 @@
-<x-filament::page>
+<x-filament-panels::page>
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div class="col-span-1">
             <x-filament::section heading="Upload Attachment">
@@ -29,4 +29,4 @@
             </x-filament::section>
         </div>
     </div>
-</x-filament::page>
+</x-filament-panels::page>
