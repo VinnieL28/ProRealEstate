@@ -34,23 +34,15 @@ class BackupPage extends Page
                 ->label('Export Leads (Excel)')
                 ->icon('heroicon-o-users')
                 ->color('success')
-                ->action(function () {
-                    return Excel::download(
-                        new LeadsExport(auth()->user()?->team_id),
-                        'leads-backup-' . now()->format('Ymd-His') . '.xlsx'
-                    );
-                }),
+                ->url(fn () => route('backup.leads-excel'))
+                ->openUrlInNewTab(),
 
             Action::make('export_deals_xlsx')
                 ->label('Export Deals (Excel)')
                 ->icon('heroicon-o-briefcase')
                 ->color('info')
-                ->action(function () {
-                    return Excel::download(
-                        new DealsExport(auth()->user()?->team_id),
-                        'deals-backup-' . now()->format('Ymd-His') . '.xlsx'
-                    );
-                }),
+                ->url(fn () => route('backup.deals-excel'))
+                ->openUrlInNewTab(),
 
             Action::make('export_full_zip')
                 ->label('Export Full ZIP (CSV)')

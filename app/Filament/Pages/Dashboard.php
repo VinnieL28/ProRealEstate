@@ -14,6 +14,7 @@ use App\Filament\Widgets\LeaderboardWidget;
 use App\Filament\Widgets\CalendarWidget;
 use App\Filament\Widgets\HotLeadsWidget;
 use App\Filament\Widgets\OnboardingProgressWidget;
+use App\Filament\Widgets\WelcomeBanner;
 
 class Dashboard extends BaseDashboard
 {
@@ -25,14 +26,15 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
+            WelcomeBanner::class,
             OnboardingProgressWidget::class,
             DashboardStats::class,
             HotLeadsWidget::class,
+            LeadsByStageChart::class,
+            DealsPerMonthChart::class,
             TodayActivity::class,
             ThisWeekStats::class,
             KpiPerformance::class,
-            LeadsByStageChart::class,
-            DealsPerMonthChart::class,
             TasksDueWidget::class,
             LeaderboardWidget::class,
             CalendarWidget::class,

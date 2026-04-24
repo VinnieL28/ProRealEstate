@@ -23,9 +23,11 @@ Route::post('/register', [LandingController::class, 'storeRegistration'])->name(
 Route::view('/terms', 'landing.terms')->name('terms');
 Route::view('/privacy', 'landing.privacy')->name('privacy');
 
-Route::get('/admin/backup/full-zip', [\App\Http\Controllers\BackupController::class, 'fullZip'])
-    ->middleware(['web', 'auth'])
-    ->name('backup.full-zip');
+Route::middleware(['web', 'auth'])->prefix('admin/backup')->name('backup.')->group(function () {
+    Route::get('/full-zip', [\App\Http\Controllers\BackupController::class, 'fullZip'])->name('full-zip');
+    Route::get('/leads-excel', [\App\Http\Controllers\BackupController::class, 'leadsExcel'])->name('leads-excel');
+    Route::get('/deals-excel', [\App\Http\Controllers\BackupController::class, 'dealsExcel'])->name('deals-excel');
+});
 
 // ── Team Invitations ────────────────────────────────────────────────────────
 Route::get('/invitation/{token}', [TeamInvitationController::class, 'show'])->name('invitation.accept.show');
