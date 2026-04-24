@@ -14,9 +14,12 @@
         </p>
 
         @if(count($leads) === 0)
-            <div class="py-8 text-center text-gray-500">
-                <x-heroicon-o-check-circle class="w-10 h-10 mx-auto mb-2 text-green-600 opacity-60" />
-                <p class="text-sm">All hot leads are up to date. Great work!</p>
+            <div class="flex items-center gap-3 py-3 px-4 rounded-lg bg-green-500/10 border border-green-500/20">
+                <x-heroicon-s-check-circle class="w-6 h-6 text-green-400 flex-shrink-0" />
+                <div>
+                    <p class="text-sm font-semibold text-green-400">All hot leads are up to date 🎉</p>
+                    <p class="text-xs text-gray-400 mt-0.5">No motivated leads have gone stale. Great work!</p>
+                </div>
             </div>
         @else
             <div class="overflow-x-auto">
