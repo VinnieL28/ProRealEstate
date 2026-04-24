@@ -20,6 +20,8 @@ use App\Http\Controllers\TwoFactorController;
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::get('/register', [LandingController::class, 'register'])->name('register.form');
 Route::post('/register', [LandingController::class, 'storeRegistration'])->name('register.store');
+Route::view('/terms', 'landing.terms')->name('terms');
+Route::view('/privacy', 'landing.privacy')->name('privacy');
 
 // ── Team Invitations ────────────────────────────────────────────────────────
 Route::get('/invitation/{token}', [TeamInvitationController::class, 'show'])->name('invitation.accept.show');

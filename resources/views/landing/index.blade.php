@@ -59,9 +59,9 @@
             </a>
         </div>
 
-        {{-- Stats --}}
+        {{-- Trust Signals --}}
         <div style="display: flex; justify-content: center; gap: 60px; margin-top: 80px; flex-wrap: wrap;">
-            @foreach(['500+ Active Users' => '🏠', '50K+ Leads Tracked' => '📊', '$2M+ in Deals Closed' => '💰'] as $stat => $icon)
+            @foreach(['Built by Investors' => '🏠', 'All-in-One Platform' => '⚡', 'Cancel Anytime' => '✅'] as $stat => $icon)
                 <div>
                     <div style="font-size: 1.1rem;">{{ $icon }} <strong style="color: #f1f5f9;">{{ $stat }}</strong></div>
                 </div>
@@ -128,23 +128,45 @@
         </div>
     </section>
 
-    {{-- Testimonials --}}
+    {{-- How It Works --}}
     <section>
-        <h2 style="text-align: center; font-size: 2.5rem; font-weight: 800; margin-bottom: 60px;">What Investors Are Saying</h2>
-        <div class="feature-grid" style="max-width: 900px; margin: 0 auto;">
+        <h2 style="text-align: center; font-size: 2.5rem; font-weight: 800; margin-bottom: 16px;">How It Works</h2>
+        <p style="text-align: center; color: #64748b; margin-bottom: 60px; font-size: 1.05rem;">From sign-up to closing deals in minutes, not weeks.</p>
+        <div class="feature-grid" style="max-width: 1000px; margin: 0 auto;">
             @foreach([
-                ['quote' => 'We went from managing leads in 5 different spreadsheets to having everything in one place. Our conversion rate is up 40%.', 'name' => 'Marcus T.', 'title' => 'Wholesaler, Dallas TX'],
-                ['quote' => 'The Twilio integration is a game-changer. I can text and call leads directly from the CRM and it logs everything automatically.', 'name' => 'Sarah K.', 'title' => 'Acquisition Manager, Phoenix AZ'],
-                ['quote' => 'Finally a CRM that understands real estate investing. The deal pipeline kanban with profit tracking is exactly what I needed.', 'name' => 'James R.', 'title' => 'Fix & Flip Investor, Atlanta GA'],
-            ] as $t)
-                <div class="card" style="position: relative;">
-                    <div style="font-size: 2rem; color: #f59e0b; margin-bottom: 12px;">"</div>
-                    <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.7; margin: 0 0 20px;">{{ $t['quote'] }}</p>
-                    <div>
-                        <div style="font-weight: 700; color: #f1f5f9;">{{ $t['name'] }}</div>
-                        <div style="color: #64748b; font-size: 0.85rem;">{{ $t['title'] }}</div>
-                    </div>
+                ['step' => '1', 'title' => 'Sign Up in 60 Seconds', 'desc' => 'Create your account, invite your team, and set up your pipeline stages. No onboarding calls or setup fees.'],
+                ['step' => '2', 'title' => 'Import or Add Leads', 'desc' => 'Add leads manually, via form capture, or bulk import. Every lead gets auto-scored and routed to the right agent.'],
+                ['step' => '3', 'title' => 'Work Deals Faster', 'desc' => 'Drag deals through stages, send SMS/calls in one click, and let automations handle the follow-ups while you focus on closing.'],
+            ] as $step)
+                <div class="card" style="text-align: center;">
+                    <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 50%; color: #fff; font-weight: 900; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">{{ $step['step'] }}</div>
+                    <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0 0 12px; color: #f1f5f9;">{{ $step['title'] }}</h3>
+                    <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.7; margin: 0;">{{ $step['desc'] }}</p>
                 </div>
+            @endforeach
+        </div>
+    </section>
+
+    {{-- FAQ --}}
+    <section>
+        <h2 style="text-align: center; font-size: 2.5rem; font-weight: 800; margin-bottom: 16px;">Frequently Asked Questions</h2>
+        <p style="text-align: center; color: #64748b; margin-bottom: 60px; font-size: 1.05rem;">Everything you need to know before getting started.</p>
+        <div style="max-width: 800px; margin: 0 auto; display: grid; gap: 16px;">
+            @foreach([
+                ['q' => 'Do I need a credit card to start the free trial?', 'a' => 'No. All plans include a 14-day free trial with no credit card required. You only pay when you decide to continue.'],
+                ['q' => 'Can I cancel anytime?', 'a' => 'Yes. Cancel anytime with one click from your billing settings. No contracts, no cancellation fees.'],
+                ['q' => 'Do you integrate with Twilio and Gmail?', 'a' => 'Yes. Bring your own Twilio number for SMS/calling, and connect your Gmail account to send and receive emails directly inside the CRM.'],
+                ['q' => 'Is my data secure?', 'a' => 'Yes. Every team has isolated data (multi-tenant architecture), all traffic is encrypted, and we support two-factor authentication for all accounts.'],
+                ['q' => 'Can I import my existing leads?', 'a' => 'Yes. You can add leads manually, via web form capture, or by bulk importing from a CSV file.'],
+                ['q' => 'How many team members can I add?', 'a' => 'Starter supports 3 agents, Pro supports 10, and Enterprise is unlimited. You can invite team members with role-based access control.'],
+            ] as $faq)
+                <details style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px 24px; cursor: pointer;">
+                    <summary style="font-weight: 700; color: #f1f5f9; font-size: 1rem; list-style: none; display: flex; justify-content: space-between; align-items: center;">
+                        <span>{{ $faq['q'] }}</span>
+                        <span style="color: #f59e0b; font-size: 1.4rem; margin-left: 16px;">+</span>
+                    </summary>
+                    <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.7; margin: 16px 0 0;">{{ $faq['a'] }}</p>
+                </details>
             @endforeach
         </div>
     </section>
@@ -152,7 +174,7 @@
     {{-- CTA --}}
     <section style="text-align: center; background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 24px; margin: 0 24px 80px; padding: 80px 40px;">
         <h2 style="font-size: 2.5rem; font-weight: 900; margin-bottom: 16px;">Ready to Close More Deals?</h2>
-        <p style="color: #64748b; font-size: 1.1rem; margin-bottom: 40px;">Join hundreds of investors using ProREI CRM to scale their business.</p>
+        <p style="color: #94a3b8; font-size: 1.1rem; margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto;">Stop juggling spreadsheets. Get the CRM built specifically for real estate investors — and start closing deals faster.</p>
         <a href="/register" class="btn-primary" style="font-size: 1.15rem; padding: 18px 48px;">
             Start Your Free 14-Day Trial →
         </a>
@@ -169,6 +191,8 @@
             <a href="#pricing" style="color: #475569; text-decoration: none;">Pricing</a>
             <a href="/admin/login" style="color: #475569; text-decoration: none;">Login</a>
             <a href="/register" style="color: #475569; text-decoration: none;">Sign Up</a>
+            <a href="/terms" style="color: #475569; text-decoration: none;">Terms</a>
+            <a href="/privacy" style="color: #475569; text-decoration: none;">Privacy</a>
         </div>
         <div>© {{ date('Y') }} Pro Real Estate Investments. All rights reserved.</div>
     </footer>
