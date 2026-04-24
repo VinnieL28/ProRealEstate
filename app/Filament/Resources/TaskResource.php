@@ -61,11 +61,58 @@ class TaskResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('assignedTo.name')->label('Assigned')->hiddenOn('sm'),
-                Tables\Columns\BadgeColumn::make('status'),
-                Tables\Columns\BadgeColumn::make('priority')->hiddenOn('sm'),
-                Tables\Columns\TextColumn::make('due_date')->dateTime()->hiddenOn('sm'),
+                Tables\Columns\IconColumn::make('priority')
+                    ->label('')
+                    ->icon(fn ($state) => match($state) {
+                        'high'   => 'heroicon-s-exclamation-triangle',
+                        'medium' => 'heroicon-s-minus-circle',
+                        'low'    => 'heroicon-s-chevron-double-down',
+                        default  => 'heroicon-o-circle-stack',
+                    })
+                    ->color(fn ($state) => match($state) {
+                        'high'   => 'danger',
+                        'medium' => 'warning',
+                        'low'    => 'gray',
+                        default  => 'gray',
+                    })
+                    ->size('lg'),
+                Tables\Columns\TextColumn::make('title')->searchable()->sortable()->weight('bold'),
+                Tables\Columns\TextColumn::make('assignedTo.name')->label('Assigned')->hiddenOn('sm')->badge()->color('gray'),
+                Tables\Columns\BadgeColumn::make('status')
+                    ->color(fn ($state) => match($state) {
+                        'done'        => 'success',
+                        'in_progress' => 'warning',
+                        'open'        => 'info',
+                        default       => 'gray',
+                    })
+                    ->icon(fn ($state) => match($state) {
+                        'done'        => 'heroicon-s-check-circle',
+                        'in_progress' => 'heroicon-s-clock',
+                        'open'        => 'heroicon-s-pencil-square',
+                        default       => null,
+                    }),
+                Tables\Columns\TextColumn::make('due_date')
+                    ->label('Due')
+                    ->hiddenOn('sm')
+                    ->formatStateUsing(function ($state, $record) {
+                        if (!$state) return '—';
+                        $due = Carbon::parse($state);
+                        if ($record->status === 'done') return $due->format('M d');
+                        if ($due->isToday()) return 'Today';
+                        if ($due->isTomorrow()) return 'Tomorrow';
+                        if ($due->isPast()) return $due->diffForHumans();
+                        return $due->format('M d');
+                    })
+                    ->badge()
+                    ->color(function ($record) {
+                        if (!$record->due_date || $record->status === 'done') return 'gray';
+                        $due = Carbon::parse($record->due_date);
+                        if ($due->isPast()) return 'danger';
+                        if ($due->isToday()) return 'warning';
+                        if ($due->isTomorrow()) return 'info';
+                        return 'gray';
+                    })
+                    ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('status')->options([

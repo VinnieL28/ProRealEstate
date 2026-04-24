@@ -221,9 +221,16 @@ class LeadResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('owner_name')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('phone')->searchable()->hiddenOn('sm'),
-                Tables\Columns\TextColumn::make('lead_source')->sortable()->hiddenOn('sm'),
+                Tables\Columns\TextColumn::make('owner_name')
+                    ->label('Lead')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold')
+                    ->description(fn ($record) => $record->phone ?? $record->email ?? null)
+                    ->icon(fn ($record) => (bool)($record->motivation_level >= 4) ? 'heroicon-s-fire' : null)
+                    ->iconColor('danger'),
+                Tables\Columns\TextColumn::make('phone')->searchable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('lead_source')->sortable()->hiddenOn('sm')->badge()->color('gray'),
                 Tables\Columns\TextColumn::make('major_market')->label('Market')->hiddenOn(['sm', 'md']),
                 Tables\Columns\BadgeColumn::make('stage')
                     ->color(fn ($state) => match($state) {

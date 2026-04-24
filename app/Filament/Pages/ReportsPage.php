@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Widgets\Reports\AgentPerformanceWidget;
+use App\Filament\Widgets\Reports\ConversionFunnelWidget;
 use App\Filament\Widgets\Reports\LeadSourceRoiWidget;
 use App\Filament\Widgets\Reports\PipelineVelocityWidget;
 use App\Filament\Widgets\Reports\RevenueByAgentChart;
@@ -10,6 +11,7 @@ use App\Filament\Widgets\Reports\ReportFilterWidget;
 use App\Filament\Widgets\Reports\RevenueByMonthChart;
 use App\Filament\Widgets\Reports\RevenueByQuarterChart;
 use Filament\Pages\Page;
+use Filament\Support\Enums\MaxWidth;
 
 class ReportsPage extends Page
 {
@@ -21,6 +23,11 @@ class ReportsPage extends Page
     protected static string  $view            = 'filament.pages.reports';
     protected static ?int    $navigationSort  = 1;
 
+    public function getMaxContentWidth(): MaxWidth
+    {
+        return MaxWidth::Full;
+    }
+
     public static function canAccess(): bool
     {
         $user = auth()->user();
@@ -31,6 +38,7 @@ class ReportsPage extends Page
     {
         return [
             ReportFilterWidget::class,
+            ConversionFunnelWidget::class,
             RevenueByMonthChart::class,
             RevenueByQuarterChart::class,
             RevenueByAgentChart::class,
