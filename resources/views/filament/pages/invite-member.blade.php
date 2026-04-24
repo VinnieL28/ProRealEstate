@@ -1,4 +1,4 @@
-<x-filament::page>
+<x-filament-panels::page>
     <div class="space-y-6">
         <div>
             <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Pending Invitations</h2>
@@ -26,4 +26,4 @@
             Invitations expire after 7 days. Members will receive an email with a signup link.
         </p>
     </div>
-</x-filament::page>
+</x-filament-panels::page>

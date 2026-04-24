@@ -1,4 +1,4 @@
-<x-filament::page>
+<x-filament-panels::page>
     <div class="space-y-4">
 
         {{-- Connection status banner --}}
@@ -46,4 +46,4 @@
         </div>
 
     </div>
-</x-filament::page>
+</x-filament-panels::page>

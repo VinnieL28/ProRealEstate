@@ -1,4 +1,4 @@
-<x-filament::page>
+<x-filament-panels::page>
     <div class="space-y-8">
         {{-- Current status --}}
         <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
@@ -104,4 +104,4 @@
             Payments processed by Stripe. Cancel anytime. All prices in USD.
         </p>
     </div>
-</x-filament::page>
+</x-filament-panels::page>

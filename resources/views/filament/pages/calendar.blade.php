@@ -1,5 +1,5 @@
-<x-filament::page>
+<x-filament-panels::page>
     @foreach($this->getWidgets() as $widget)
         @livewire($widget)
     @endforeach
-</x-filament::page>
+</x-filament-panels::page>

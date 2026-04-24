@@ -1,4 +1,4 @@
-<x-filament::page>
+<x-filament-panels::page>
     <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4">
         @foreach($columns as $stage => $column)
             <div class="bg-gray-900/70 border border-gray-800 rounded-xl p-3" x-data
@@ -54,4 +54,4 @@
     @once
         <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     @endonce
-</x-filament::page>
+</x-filament-panels::page>

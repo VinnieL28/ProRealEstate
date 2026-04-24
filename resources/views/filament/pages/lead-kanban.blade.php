@@ -1,4 +1,4 @@
-<x-filament::page>
+<x-filament-panels::page>
     {{-- SortableJS via CDN --}}
     @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
@@ -158,4 +158,4 @@
             @endforeach
         </div>
     </div>
-</x-filament::page>
+</x-filament-panels::page>

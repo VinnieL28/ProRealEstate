@@ -1,4 +1,4 @@
-<x-filament::page>
+<x-filament-panels::page>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div class="space-y-2">
             <h2 class="text-lg font-semibold text-white">Calls</h2>
@@ -42,4 +42,4 @@
             </div>
         </div>
     </div>
-</x-filament::page>
+</x-filament-panels::page>

@@ -1,4 +1,4 @@
-<x-filament::page>
+<x-filament-panels::page>
     <div class="max-w-2xl mx-auto space-y-6">
 
         {{-- Progress Bar --}}
@@ -146,4 +146,4 @@
 
         </div>
     </div>
-</x-filament::page>
+</x-filament-panels::page>

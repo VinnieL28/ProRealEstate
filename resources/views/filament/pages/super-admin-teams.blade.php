@@ -1,4 +1,4 @@
-<x-filament::page>
+<x-filament-panels::page>
     <div class="space-y-4">
         @if(session('super_admin_viewing_team'))
             <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-xl px-4 py-3 flex items-center justify-between">
@@ -75,4 +75,4 @@
             </table>
         </div>
     </div>
-</x-filament::page>
+</x-filament-panels::page>

@@ -1,4 +1,4 @@
-<x-filament::page>
+<x-filament-panels::page>
     <div class="space-y-6">
         {{-- Revenue line chart (full width) --}}
         @livewire(\App\Filament\Widgets\Reports\RevenueByMonthChart::class)
@@ -18,4 +18,4 @@
         {{-- Agent Performance table --}}
         @livewire(\App\Filament\Widgets\Reports\AgentPerformanceWidget::class)
     </div>
-</x-filament::page>
+</x-filament-panels::page>
