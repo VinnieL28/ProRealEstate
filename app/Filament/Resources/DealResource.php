@@ -34,6 +34,21 @@ class DealResource extends Resource
 
     protected static ?string $navigationGroup = 'Deals';
 
+    protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'stage', 'contract_type'];
+    }
+
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return [
+            'Stage'         => $record->stage ?? '—',
+            'Sale Price'    => $record->sale_price ? '$' . number_format($record->sale_price) : '—',
+        ];
+    }
+
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();

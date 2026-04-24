@@ -27,6 +27,21 @@ class ContactResource extends Resource
     protected static ?string $navigationLabel = 'Contacts';
     protected static ?int    $navigationSort  = 2;
 
+    protected static ?string $recordTitleAttribute = 'first_name';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['first_name', 'last_name', 'email', 'phone_primary', 'company'];
+    }
+
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return [
+            'Phone' => $record->phone_primary ?? '—',
+            'Email' => $record->email ?? '—',
+        ];
+    }
+
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();

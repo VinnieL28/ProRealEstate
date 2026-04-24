@@ -53,6 +53,21 @@ class LeadResource extends Resource
 
     protected static ?string $navigationLabel = 'Leads';
 
+    protected static ?string $recordTitleAttribute = 'owner_name';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['owner_name', 'phone', 'email', 'major_market'];
+    }
+
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return [
+            'Phone' => $record->phone ?? '—',
+            'Stage' => $record->stage ?? '—',
+        ];
+    }
+
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
         $query = parent::getEloquentQuery();
