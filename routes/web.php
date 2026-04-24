@@ -23,6 +23,10 @@ Route::post('/register', [LandingController::class, 'storeRegistration'])->name(
 Route::view('/terms', 'landing.terms')->name('terms');
 Route::view('/privacy', 'landing.privacy')->name('privacy');
 
+Route::get('/admin/backup/full-zip', [\App\Http\Controllers\BackupController::class, 'fullZip'])
+    ->middleware(['web', 'auth'])
+    ->name('backup.full-zip');
+
 // ── Team Invitations ────────────────────────────────────────────────────────
 Route::get('/invitation/{token}', [TeamInvitationController::class, 'show'])->name('invitation.accept.show');
 Route::post('/invitation/{token}', [TeamInvitationController::class, 'accept'])->name('invitation.accept');
