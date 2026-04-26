@@ -29,6 +29,7 @@ class ListLeads extends ListRecords
                         ->acceptedFileTypes(['text/csv', 'text/plain', 'application/csv', 'application/vnd.ms-excel'])
                         ->disk('local')
                         ->directory('imports')
+                        ->maxSize(5120)
                         ->required()
                         ->helperText('Columns supported: first_name, last_name, owner_name, phone, email, lead_source, notes, motivation_level, asking_price, stage'),
                 ])

@@ -84,8 +84,11 @@ return new class extends Migration {
                 'property_manager',
                 'real_estate_agent',
             ];
-            $list = "'" . implode("','", $roles) . "'";
-            \Illuminate\Support\Facades\DB::statement("ALTER TABLE users MODIFY role ENUM($list) DEFAULT 'owner'");
+            // MySQL-only — sqlite (used in tests) doesn't support ENUM modify
+            if (\Illuminate\Support\Facades\DB::connection()->getDriverName() === 'mysql') {
+                $list = "'" . implode("','", $roles) . "'";
+                \Illuminate\Support\Facades\DB::statement("ALTER TABLE users MODIFY role ENUM($list) DEFAULT 'owner'");
+            }
         }
     }
 

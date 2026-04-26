@@ -19,7 +19,9 @@ use App\Http\Controllers\TwoFactorController;
 // ── Public Marketing Landing Page ──────────────────────────────────────────
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::get('/register', [LandingController::class, 'register'])->name('register.form');
-Route::post('/register', [LandingController::class, 'storeRegistration'])->name('register.store');
+Route::post('/register', [LandingController::class, 'storeRegistration'])
+    ->middleware('throttle:5,1')
+    ->name('register.store');
 Route::view('/terms', 'landing.terms')->name('terms');
 Route::view('/privacy', 'landing.privacy')->name('privacy');
 
@@ -74,7 +76,7 @@ Route::post('/settings', [SettingController::class, 'update'])->name('settings.u
 
 // Two-Factor Authentication
 Route::get('/2fa/challenge', [TwoFactorController::class, 'challenge'])->name('2fa.challenge')->middleware('guest');
-Route::post('/2fa/verify', [TwoFactorController::class, 'verify'])->name('2fa.verify')->middleware('guest');
+Route::post('/2fa/verify', [TwoFactorController::class, 'verify'])->name('2fa.verify')->middleware(['guest', 'throttle:5,1']);
 Route::middleware('auth')->group(function () {
     Route::get('/2fa/setup', [TwoFactorController::class, 'setup'])->name('2fa.setup');
     Route::post('/2fa/enable', [TwoFactorController::class, 'enable'])->name('2fa.enable');

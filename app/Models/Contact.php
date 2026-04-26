@@ -14,6 +14,7 @@ class Contact extends Model
 {
     use HasFactory;
     use LogsActivity;
+    use \Illuminate\Database\Eloquent\SoftDeletes;
 
     protected $fillable = [
         'team_id',

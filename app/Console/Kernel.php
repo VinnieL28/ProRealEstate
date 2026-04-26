@@ -17,6 +17,9 @@ class Kernel extends ConsoleKernel
 
         // Send daily digest emails at 8am
         $schedule->command('notifications:send-daily-digest')->dailyAt('08:00');
+
+        // Process drip campaign enrollments every 5 minutes
+        $schedule->command('drip:process')->everyFiveMinutes()->withoutOverlapping();
     }
 
     /**

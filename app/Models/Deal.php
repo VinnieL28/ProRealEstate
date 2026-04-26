@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Deal extends Model
 {
-    use HasFactory, HasTeamScope;
+    use HasFactory, HasTeamScope, \Illuminate\Database\Eloquent\SoftDeletes;
 
     protected $fillable = [
         'team_id',

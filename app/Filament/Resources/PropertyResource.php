@@ -208,6 +208,7 @@ class PropertyResource extends Resource
                         ->form([
                             FileUpload::make('file')
                                 ->required()
+                                ->maxSize(5120)
                                 ->acceptedFileTypes(['text/csv', 'text/plain', 'application/vnd.ms-excel'])
                                 ->directory('imports'),
                         ])

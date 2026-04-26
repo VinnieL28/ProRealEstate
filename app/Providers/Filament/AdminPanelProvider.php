@@ -79,6 +79,14 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
                 \App\Http\Middleware\EnsureTeamIsActive::class,
-            ]);
+            ])
+            ->plugins([])
+            ->bootUsing(function () {
+                \Illuminate\Support\Facades\RateLimiter::for('filament-login', function ($request) {
+                    return [
+                        \Illuminate\Cache\RateLimiting\Limit::perMinute(5)->by($request->input('email').$request->ip()),
+                    ];
+                });
+            });
     }
 }

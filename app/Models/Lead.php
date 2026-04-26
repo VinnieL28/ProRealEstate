@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Cache;
 
 class Lead extends Model
 {
-    use HasFactory, HasTeamScope;
+    use HasFactory, HasTeamScope, \Illuminate\Database\Eloquent\SoftDeletes;
 
     protected $fillable = [
         'team_id',

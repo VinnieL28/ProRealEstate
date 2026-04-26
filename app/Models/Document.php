@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Document extends Model
 {
-    use HasTeamScope;
+    use HasTeamScope, \Illuminate\Database\Eloquent\SoftDeletes;
     protected $fillable = [
         'team_id',
         'lead_id',

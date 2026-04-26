@@ -21,6 +21,7 @@ class AttachmentsRelationManager extends RelationManager
             TextInput::make('name')->required(),
             FileUpload::make('path')
                 ->disk(config('filesystems.default'))
+                ->maxSize(10240)
                 ->directory('attachments')
                 ->required(),
         ]);

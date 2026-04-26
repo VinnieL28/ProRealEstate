@@ -12,13 +12,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Add super_admin role using raw SQL to modify enum
-        DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM(
-            'super_admin','owner','admin','acquisition_manager','lead_manager',
-            'cold_caller','dispo_manager','acquisition_sales_manager',
-            'transaction_coordinator','acquisition_closer','lead_manager_verifier',
-            'property_manager','real_estate_agent'
-        ) NULL");
+        // MySQL-only — sqlite (used in tests) doesn't support ENUM modify
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM(
+                'super_admin','owner','admin','acquisition_manager','lead_manager',
+                'cold_caller','dispo_manager','acquisition_sales_manager',
+                'transaction_coordinator','acquisition_closer','lead_manager_verifier',
+                'property_manager','real_estate_agent'
+            ) NULL");
+        }
 
         Schema::table('users', function (Blueprint $table) {
             $table->string('two_factor_secret')->nullable()->after('password');

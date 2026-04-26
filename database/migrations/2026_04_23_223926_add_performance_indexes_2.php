@@ -88,6 +88,11 @@ return new class extends Migration
 
     private function indexExists(string $table, string $index): bool
     {
+        // Skip on non-MySQL drivers (sqlite/pgsql) — those drivers don't support SHOW INDEX
+        if (\Illuminate\Support\Facades\DB::connection()->getDriverName() !== 'mysql') {
+            return true;
+        }
+
         return collect(\Illuminate\Support\Facades\DB::select("SHOW INDEX FROM `{$table}`"))
             ->pluck('Key_name')
             ->contains($index);

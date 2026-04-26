@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Property extends Model
 {
-    use HasFactory, HasTeamScope;
+    use HasFactory, HasTeamScope, \Illuminate\Database\Eloquent\SoftDeletes;
 
     protected $fillable = [
         'team_id',

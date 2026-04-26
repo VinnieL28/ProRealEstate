@@ -76,17 +76,12 @@ return new class extends Migration {
             DB::table('leads')->whereNull('stage')->update(['stage' => DB::raw('status')]);
         }
 
-        Schema::table('leads', function (Blueprint $table) {
-            if (Schema::hasColumn('leads', 'name')) {
-                $table->dropColumn('name');
+        // Split into separate Schema::table blocks for sqlite compatibility
+        foreach (['name', 'source', 'status'] as $col) {
+            if (Schema::hasColumn('leads', $col)) {
+                Schema::table('leads', fn (Blueprint $table) => $table->dropColumn($col));
             }
-            if (Schema::hasColumn('leads', 'source')) {
-                $table->dropColumn('source');
-            }
-            if (Schema::hasColumn('leads', 'status')) {
-                $table->dropColumn('status');
-            }
-        });
+        }
     }
 
     public function down(): void

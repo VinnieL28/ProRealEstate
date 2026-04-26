@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Task extends Model
 {
-    use HasFactory, HasTeamScope;
+    use HasFactory, HasTeamScope, \Illuminate\Database\Eloquent\SoftDeletes;
 
     protected $fillable = [
         'title',

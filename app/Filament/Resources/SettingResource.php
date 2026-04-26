@@ -44,6 +44,7 @@ class SettingResource extends Resource
                         ->label('Company Logo')
                         ->image()
                         ->directory('logos')
+                        ->maxSize(2048)
                         ->columnSpanFull(),
                 ]),
 

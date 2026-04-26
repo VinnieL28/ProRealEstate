@@ -59,6 +59,8 @@ class FileManagerPage extends Page implements HasForms
                 FileUpload::make('file')
                     ->disk(config('filesystems.default'))
                     ->directory('attachments')
+                    ->maxSize(10240)
+                    ->acceptedFileTypes(['application/pdf', 'image/*', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/plain', 'text/csv'])
                     ->required(),
             ])
             ->statePath('data');
