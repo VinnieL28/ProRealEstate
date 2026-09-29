@@ -32,8 +32,8 @@
         {{-- Header --}}
         <div class="flex items-center justify-between flex-wrap gap-3">
             <div>
-                <h1 class="text-3xl font-bold text-white">Deal Pipeline</h1>
-                <p class="text-sm text-gray-400 mt-1">Track deals by stage — orange border = stale (&gt;14 days)</p>
+                <h1 class="text-3xl font-bold text-gray-950 dark:text-white">Deal Pipeline</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Track deals by stage — orange border = stale (&gt;14 days)</p>
             </div>
             <x-filament::button
                 tag="a"

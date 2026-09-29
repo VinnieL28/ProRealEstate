@@ -6,8 +6,9 @@
         <div class="absolute top-0 right-0 w-64 h-64 rounded-full opacity-20 blur-3xl"
              style="background: radial-gradient(circle, #f59e0b 0%, transparent 70%); transform: translate(30%, -30%);"></div>
 
-        <div class="relative flex items-center justify-between flex-wrap gap-4">
-            <div class="flex-1 min-w-0">
+        {{-- Stacked on phones: a flex-1 (basis 0) text column next to the badges shrank to one word per line. --}}
+        <div class="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div class="min-w-0 md:flex-1">
                 <div class="flex items-center gap-2 text-xs text-gray-400 mb-2">
                     <x-heroicon-m-calendar class="w-4 h-4" />
                     <span>{{ $today }}</span>

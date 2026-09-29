@@ -32,8 +32,8 @@
         {{-- Header --}}
         <div class="flex items-center justify-between flex-wrap gap-3">
             <div>
-                <h1 class="text-3xl font-bold text-white">Lead Pipeline</h1>
-                <p class="text-sm text-gray-400 mt-1">Drag leads across stages — scores color-code priority</p>
+                <h1 class="text-3xl font-bold text-gray-950 dark:text-white">Lead Pipeline</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Drag leads across stages — scores color-code priority</p>
             </div>
             <x-filament::button
                 tag="a"
@@ -47,7 +47,7 @@
         </div>
 
         {{-- Legend --}}
-        <div class="flex gap-6 text-xs text-gray-400 flex-wrap bg-gray-900/50 border border-gray-800 rounded-lg px-4 py-2.5">
+        <div class="flex gap-6 text-xs text-gray-600 dark:text-gray-400 flex-wrap bg-gray-100 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-2.5">
             <span class="flex items-center gap-2"><span class="inline-block w-3 h-3 rounded-full bg-green-500"></span>Hot (Score ≥ 70)</span>
             <span class="flex items-center gap-2"><span class="inline-block w-3 h-3 rounded-full bg-yellow-500"></span>Warm (40–69)</span>
             <span class="flex items-center gap-2"><span class="inline-block w-3 h-3 rounded-full bg-red-500"></span>Cold (&lt; 40)</span>
