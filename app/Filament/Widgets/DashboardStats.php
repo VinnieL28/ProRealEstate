@@ -35,7 +35,9 @@ class DashboardStats extends BaseWidget
             $closedDeals      = $scope(Deal::query())->where('stage', 'closed_won')->count();
             $closedThisMonth  = $scope(Deal::query())->where('stage', 'closed_won')->whereMonth('updated_at', now()->month)->count();
             $revenueThisMonth = $scope(Deal::query())->where('stage', 'closed_won')->whereMonth('updated_at', now()->month)->sum('profit') ?? 0;
-            $conversionRate   = $totalLeads > 0 ? round(($closedDeals / $totalLeads) * 100, 1) : 0;
+            $closedLeads      = $scope(Lead::query())->where('stage', 'closed_won')->count();
+            // Share of leads that closed (not closed deals / leads, which can exceed 100%).
+            $conversionRate   = $totalLeads > 0 ? round(($closedLeads / $totalLeads) * 100, 1) : 0;
             $avgProfit        = $scope(Deal::query())->where('stage', 'closed_won')->avg('profit') ?? 0;
 
             // Week-over-week deltas

@@ -16,8 +16,8 @@ class TopStats extends BaseWidget
         $activeLeads = Lead::whereNotIn('stage', ['closed_won', 'closed_lost'])->count();
         $totalProperties = Property::count();
         $openDeals = Deal::whereNotIn('stage', ['closed_won', 'closed_lost'])->count();
-        $closedDeals = Deal::where('stage', 'closed_won')->count();
-        $conversion = $totalLeads > 0 ? round(($closedDeals / $totalLeads) * 100, 2) : 0;
+        $closedLeads = Lead::where('stage', 'closed_won')->count();
+        $conversion = $totalLeads > 0 ? round(($closedLeads / $totalLeads) * 100, 2) : 0;
         $avgProfit = Deal::where('stage', 'closed_won')->get()->avg(fn ($deal) => $deal->profit) ?? 0;
 
         return [

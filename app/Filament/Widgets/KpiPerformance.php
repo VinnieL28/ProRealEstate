@@ -13,7 +13,7 @@ class KpiPerformance extends BaseWidget
     protected function getStats(): array
     {
         $totalLeads = Lead::count();
-        $closedDeals = Deal::where('stage', 'closed_won')->count();
+        $closedLeads = Lead::where('stage', 'closed_won')->count();
         $avgDaysToClose = Deal::whereNotNull('contract_date')
             ->whereNotNull('closing_date')
             ->where('stage', 'closed_won')
@@ -27,7 +27,7 @@ class KpiPerformance extends BaseWidget
         return [
             Stat::make('Lead → Appointment', $totalLeads > 0 ? round(($appt / $totalLeads) * 100, 2) . '%' : '0%'),
             Stat::make('Offer → Contract', $offersMade > 0 ? round(($contracts / $offersMade) * 100, 2) . '%' : '0%'),
-            Stat::make('Lead → Close', $totalLeads > 0 ? round(($closedDeals / $totalLeads) * 100, 2) . '%' : '0%'),
+            Stat::make('Lead → Close', $totalLeads > 0 ? round(($closedLeads / $totalLeads) * 100, 2) . '%' : '0%'),
             Stat::make('Avg Days to Close', round($avgDaysToClose, 1) . ' days'),
         ];
     }
