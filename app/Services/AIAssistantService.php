@@ -15,8 +15,10 @@ class AIAssistantService
 
     public function __construct()
     {
-        $this->client = new Client(['verify' => false]);
-        $this->apiKey = env('GROQ_API_KEY', '');
+        // TLS verification stays on: the request carries the API key and CRM data.
+        $this->client = new Client(['timeout' => 60]);
+        // Read through config, not env(): env() returns null once config is cached in production.
+        $this->apiKey = (string) config('services.groq.key', '');
     }
 
     public function chat(array $messages): string
