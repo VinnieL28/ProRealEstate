@@ -20,6 +20,13 @@ class DemoDataSeeder extends Seeder
 {
     public function run(): void
     {
+        // Every demo user logs in with the password "password": never create them on a real server.
+        if (! app()->environment('local', 'testing')) {
+            $this->command?->warn('Demo data is only seeded when APP_ENV is local or testing. Skipped.');
+
+            return;
+        }
+
         // Create a demo team and users
         // First create the owner user
         $owner = User::firstOrCreate(
